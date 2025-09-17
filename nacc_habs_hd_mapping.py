@@ -77,18 +77,18 @@ def transform_relationship(value):
   elif value == 6:
     return 2
   elif value == 7:
-    return 8
+    return np.nan
   elif value == -8888:
-    return 9
+    return np.nan
   elif value == -9999:
-    return -4
+    return np.nan
   return value
 df['DEM.NACCREFR'] = df['Informant_SubjectRelationship'].apply(transform_relationship)
 cols_to_save.append('DEM.NACCREFR')
 forma1_list.append('DEM.NACCREFR')
 
 # ID_Hispanic -> HISPOR
-mapping_hispanic = {2:1, 3:2, 4:3, 5:50, 1:88, -9999:-4, -8888:99}
+mapping_hispanic = {2:1, 3:2, 4:3, 5:50, 1:np.nan, -9999:np.nan, -8888:np.nan}
 df['DEM.HISPOR'] = df['ID_Hispanic'].replace(mapping_hispanic)
 cols_to_save.append('DEM.HISPOR')
 forma1_list.append('DEM.HISPOR')
@@ -100,20 +100,18 @@ def map_hispanic(value):
   elif value == 88:
     return 0
   elif value in [-4, 99]:
-    return 9
+    return np.nan
 df['DEM.HISPANIC'] = df['DEM.HISPOR'].apply(map_hispanic)
 cols_to_save.append('DEM.HISPANIC')
 forma1_list.append('DEM.HISPANIC')
 
-## change from -9999
 # ID_Hispanic_Other -> HISPORX
 def transform_hisporx(value):
   if value == -9999:
-    return 9
+    return np.nan
   else:
     return value
 df['DEM.HISPORX'] = df['ID_Hispanic_Other'].apply(transform_hisporx)
-#df['DEM.HISPORX'] = df['ID_Hispanic_Other']
 cols_to_save.append('DEM.HISPORX')
 forma1_list.append('DEM.HISPORX')
 
@@ -122,9 +120,9 @@ race_cols = ['ID_Race_White', 'ID_Race_Black', 'ID_Race_IndianAlaska', 'ID_Race_
 def determine_race(row):
   values = [row[col] for col in race_cols]
   if all(v in [-8888, -9999] for v in values):
-    return 99
+    return np.nan
   if all(pd.isna(v) for v in values):
-    return 88
+    return np.nan
   if row['ID_Race_White'] == 1:
     return 1
   if row['ID_Race_Black'] == 1:
@@ -138,14 +136,14 @@ def determine_race(row):
   if row['ID_Race_Other'] == 1:
     return 50
   if all(v == 0 for v in values):
-    return 88
-  return 88
+    return np.nan
+  return np.nan
 df['DEM.RACE'] = df.apply(determine_race, axis=1)
 cols_to_save.append('DEM.RACE')
 forma1_list.append('DEM.RACE')
 
 # ID_Language_Primary -> PRIMLANG
-mapping_language = {1:1, 2:2, 3:3, -8888:9, -9999:9} # 1: English, 2: Spanish, 3: Other
+mapping_language = {1:1, 2:2, 3:3, -8888:np.nan, -9999:np.nan} # 1: English, 2: Spanish, 3: Other
 df['DEM.PRIMLANG'] = df['ID_Language_Primary'].replace(mapping_language)
 cols_to_save.append('DEM.PRIMLANG')
 forma1_list.append('DEM.PRIMLANG')
@@ -156,13 +154,13 @@ cols_to_save.append('DEM.EDUC')
 forma1_list.append('DEM.EDUC')
 
 # ID_MaritalStatus -> MARISTAT
-mapping_marital = {1:1, 2:3, 3:4, 4:2, 5:5, -9999:6, 6:9, -8888:9}
+mapping_marital = {1:1, 2:3, 3:4, 4:2, 5:5, -9999:6, 6:np.nan, -8888:np.nan}
 df['DEM.MARISTAT'] = df['ID_MaritalStatus'].replace(mapping_marital)
 cols_to_save.append('DEM.MARISTAT')
 forma1_list.append('DEM.MARISTAT')
 
 # CDR_HH_Household_Level -> INDEPEND
-mapping_independ = {5:1, 4:2, 3:3, 2:3, 1:4, -8888:9, -9999:9}
+mapping_independ = {5:1, 4:2, 3:3, 2:3, 1:4, -8888:np.nan, -9999:np.nan}
 df['DEM.INDEPEND'] = df['CDR_HH_Household_Level'].map(mapping_independ)
 cols_to_save.append('DEM.INDEPEND')
 forma1_list.append('DEM.INDEPEND')
@@ -181,7 +179,7 @@ cols_to_save.append('CODEM.INFIRYR')
 forma2_list.append('CODEM.INFIRYR')
 
 # Informant_Sex -> INSEX
-mapping_sex = {0:1, 1:2, -8888:-4, -9999:-4}
+mapping_sex = {0:1, 1:2, -8888:np.nan, -9999:np.nan}
 df['CODEM.INSEX'] = df['Informant_Sex'].map(mapping_sex)
 cols_to_save.append('CODEM.INSEX')
 forma2_list.append('CODEM.INSEX')
@@ -197,7 +195,9 @@ cols_to_save.append('CODEM.INHISP')
 forma2_list.append('CODEM.INHISP')
 
 # Inf_Hispanic_Other -> INHISPOX
+general_map = {-9999:np.nan, -8888:np.nan, -4:np.nan}
 df['CODEM.INHISPOX'] = df['Inf_Hispanic_Other']
+df['CODEM.INHISPOX'] = df['CODEM.INHISPOX'].replace(general_map)
 cols_to_save.append('CODEM.INHISPOX')
 forma2_list.append('CODEM.INHISPOX')
 
@@ -206,9 +206,9 @@ race_cols = ['Informant_Race_White', 'Informant_Race_Black', 'Informant_Race_Ind
 def determine_race(row):
   values = [row[col] for col in race_cols]
   if all(v in [-8888, -9999] for v in values):
-    return 99
+    return np.nan
   if all(pd.isna(v) for v in values):
-    return 88
+    return np.nan
   if row['Informant_Race_White'] == 1:
     return 1
   if row['Informant_Race_Black'] == 1:
@@ -222,41 +222,44 @@ def determine_race(row):
   if row['Informant_Race_Other'] == 1:
     return 50
   if all(v == 0 for v in values):
-    return 88
-  return 88
+    return np.nan
+  return np.nan
 df['CODEM.INRACE'] = df.apply(determine_race, axis=1)
 cols_to_save.append('CODEM.INRACE')
 forma2_list.append('CODEM.INRACE')
 
 # Informant_Race_Other -> INRACEX
 df['CODEM.INRACEX'] = df['Informant_Race_Specify']
+df['CODEM.INRACEX'] = df['CODEM.INRACEX'].replace(general_map)
 cols_to_save.append('CODEM.INRACEX')
 forma2_list.append('CODEM.INRACEX')
 
 # Informant_Education_Level -> INEDUC
 df['CODEM.INEDUC'] = df['Informant_EducationLevel']
+df['CODEM.INEDUC'] = df['CODEM.INEDUC'].replace(general_map)
 cols_to_save.append('CODEM.INEDUC')
 forma2_list.append('CODEM.INEDUC')
 
 # Informant_SubjectRelationship -> INRELTO
-mapping_inrelto = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, -9999:-4, -8888:-4}
+mapping_inrelto = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, -9999:np.nan, -8888:np.nan}
 df['CODEM.INRELTO'] = df['Informant_SubjectRelationship'].map(mapping_inrelto)
 cols_to_save.append('CODEM.INRELTO')
 forma2_list.append('CODEM.INRELTO')
 
 # Informant_SubjectRelationship_Other -> INRELTOX
 df['CODEM.INRELTOX'] = df['Informant_SubjectRelationship_Other']
+df['CODEM.INRELTOX'] = df['CODEM.INRELTOX'].replace(general_map)
 cols_to_save.append('CODEM.INRELTOX')
 forma2_list.append('CODEM.INRELTOX')
 
 # Informant_LiveWith -> INLIVWTH
-mapping_livewith = {0:0, 1:1, -9999:-4, -8888:-4}
+mapping_livewith = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CODEM.INLIVWTH'] = df['Informant_LiveWith'].map(mapping_livewith)
 cols_to_save.append('CODEM.INLIVWTH')
 forma2_list.append('CODEM.INLIVWTH')
 
 # Informant_LiveWith_No_Visit ->INVISITS
-mapping_visits = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, -9999:8, -8888:-4}
+mapping_visits = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, -9999:np.nan, -8888:np.nan}
 df['CODEM.INVISITS'] = df['Informant_LiveWith_No_Visit'].map(mapping_visits)
 cols_to_save.append('CODEM.INVISITS')
 forma2_list.append('CODEM.INVISITS')
@@ -267,7 +270,7 @@ cols_to_save.append('CODEM.INCALLS')
 forma2_list.append('CODEM.INCALLS')
 
 # Informant_Reliability -> INRELY
-mapping_rely = {0:0, 1:1, -9999:-4, -8888:-4}
+mapping_rely = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CODEM.INRELY'] = df['Informant_Reliability'].map(mapping_rely)
 cols_to_save.append('CODEM.INRELY')
 forma2_list.append('CODEM.INRELY')
@@ -276,7 +279,7 @@ forma2_list.append('CODEM.INRELY')
 forma3_list = []
 
 # Family_History_Firstdegree -> NACCFAM
-mapping_famhist = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_famhist = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['FAM.NACCFAM'] = df['Family_History_Firstdegree'].map(mapping_famhist)
 cols_to_save.append('FAM.NACCFAM')
 forma3_list.append('FAM.NACCFAM')
@@ -294,7 +297,7 @@ cols_to_save.append('MED.NACCAMD')
 forma4_list.append('MED.NACCAMD')
 def determine_anymeds(val):
   if val in [-9999, -8888]:
-    return -4
+    return np.nan
   return 1 if val > 0 else 0
 df['MED.ANYMEDS'] = df['MED.NACCAMD'].apply(determine_anymeds)
 cols_to_save.append('MED.ANYMEDS')
@@ -305,6 +308,7 @@ mapping_rename_meds = {f'Medication_{i}_Name': f'MED.DRUG{i}' for i in range(1, 
 df.rename(columns=mapping_rename_meds, inplace=True)
 for i in range(1, 26):
   col_name = f'MED.DRUG{i}'
+  df[col_name] = df[col_name].replace(general_map)
   cols_to_save.append(col_name)
   forma4_list.append(col_name)
 
@@ -315,11 +319,12 @@ cond_any1 = (admed_df == 1).any(axis=1)
 cond_all0 = (admed_df == 0).all(axis=1)
 cond_all_missing = admed_df.apply(lambda r: r.isin([-8888, -9999]).all(), axis=1)
 df['MED.NACCADMD'] = np.select([cond_any1, cond_all0, cond_all_missing], [1, 0, -4], default=0)
+df['MED.NACCADMD'] = df['MED.NACCADMD'].replace(general_map)
 cols_to_save.append('MED.NACCADMD')
 forma4_list.append('MED.NACCADMD')
 
 # DSQ_Meds -> NACCDBMD
-mapping_dsq = {0:0, 1:1, -9999:-4, -8888:-4}
+mapping_dsq = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['MED.NACCDBMD'] = df['DSQ_Meds'].map(mapping_dsq)
 cols_to_save.append('MED.NACCDBMD')
 forma4_list.append('MED.NACCDBMD')
@@ -328,7 +333,7 @@ forma4_list.append('MED.NACCDBMD')
 forma5_list = []
 
 # Smoke_Currently -> TOBAC30
-mapping_tobacco = {0:0, 1:1, -9999:9, -8888:-4}
+mapping_tobacco = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.TOBAC30'] = df['Smoke_Currently'].map(mapping_tobacco)
 cols_to_save.append('HLT.TOBAC30')
 forma5_list.append('HLT.TOBAC30')
@@ -344,10 +349,10 @@ def calculate_smokyrs(row):
   if begin == -9999 and end == -9999:
     return 0
   if (begin == -9999 and end not in [-9999, -8888]) or (end == -9999 and begin not in [-9999, -8888]):
-    return 88
+    return np.nan
   if (begin == -8888 and end not in [-9999, -8888]) or (end == -8888 and begin not in [-9999, -8888]):
-    return 99
-  return -4
+    return np.nan
+  return np.nan
 df['HLT.SMOKYRS'] = df.apply(calculate_smokyrs, axis=1)
 cols_to_save.append('HLT.SMOKYRS')
 forma5_list.append('HLT.SMOKYRS')
@@ -355,13 +360,13 @@ forma5_list.append('HLT.SMOKYRS')
 # Smoke_Ever_PerDay -> PACKSPER
 def calculate_packsper(value):
   if value == -9999:
-    return 8
+    return np.nan
   if value == -8888:
-    return 9
+    return np.nan
   if value == 0:
     return 0
   if pd.isna(value):
-    return -4
+    return np.nan
   packs = value / 20
   if 0 < packs < 0.5:
     return 1
@@ -373,7 +378,7 @@ def calculate_packsper(value):
     return 4
   elif packs > 2:
     return 5
-  return -4
+  return np.nan
 df['HLT.PACKSPER'] = df['Smoke_Ever_PerDay'].apply(calculate_packsper)
 cols_to_save.append('HLT.PACKSPER')
 forma5_list.append('HLT.PACKSPER')
@@ -384,13 +389,13 @@ cols_to_save.append('HLT.QUITSMOK')
 forma5_list.append('HLT.QUITSMOK')
 
 # AUDIT_1 -> ALCFREQ
-mapping_alc = {0:0, 1:1, 2:2, 3:3, 4:4, -9999:8, -8888:9}
+mapping_alc = {0:0, 1:1, 2:2, 3:3, 4:4, -9999:np.nan, -8888:np.nan}
 df['HLT.ALCFREQ'] = df['AUDIT_1'].map(mapping_alc)
 cols_to_save.append('HLT.ALCFREQ')
 forma5_list.append('HLT.ALCFREQ')
 
 # CDP_Myocardial -> CVHATT
-mapping_cvhatt = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_cvhatt = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.CVHATT'] = df['CDP_Myocardial'].map(mapping_cvhatt)
 cols_to_save.append('HLT.CVHATT')
 forma5_list.append('HLT.CVHATT')
@@ -404,22 +409,22 @@ def compute_heart_attack_year(row):
     if str(age_heart_attack) not in ['-9999', '-8888'] and str(visit_yr) not in ['-9999', '-8888'] and str(current_age) not in ['-9999', '-8888']:
       return int(visit_yr - (current_age - age_heart_attack))
   elif age_heart_attack == -8888:
-    return 9999
+    return np.nan
   elif age_heart_attack == -9999:
-    return 8888
-  return -4
+    return np.nan
+  return np.nan
 df['HLT.HATTYEAR'] = df.apply(compute_heart_attack_year, axis=1)
 cols_to_save.append('HLT.HATTYEAR')
 forma5_list.append('HLT.HATTYEAR')
 
 # CDP_HeartDisease -> CVANGINA
-mapping_angina = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_angina = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.CVANGINA'] = df['CDP_HeartDisease'].map(mapping_angina)
 cols_to_save.append('HLT.CVANGINA')
 forma5_list.append('HLT.CVANGINA')
 
 # IMH_HeartAttack -> CVOTHR
-mapping_heartattack = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_heartattack = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.CVOTHR'] = df['IMH_HeartAttack'].map(mapping_heartattack)
 cols_to_save.append('HLT.CVOTHR')
 forma5_list.append('HLT.CVOTHR')
@@ -432,10 +437,10 @@ def determine_cvstroke(row):
   if valid_values:
     return 1 if 1 in valid_values else 0
   if all(v == -9999 for v in values):
-    return -4
+    return np.nan
   if all(v in [-8888, -9999] for v in values):
-    return 9
-  return -4
+    return np.nan
+  return np.nan
 df['HLT.CVSTROKE'] = df.apply(determine_cvstroke, axis=1)
 cols_to_save.append('HLT.CVSTROKE')
 forma5_list.append('HLT.CVSTROKE')
@@ -448,23 +453,23 @@ def calculate_naccstyr(row):
   if valid_values:
     return max(valid_values)
   if all(v == -9999 for v in values):
-    return 8888
+    return np.nan
   if all(v in [-8888, -9999] for v in values):
-    return 9999
-  return 9999
+    return np.nan
+  return np.nan
 df['HLT.NACCSTYR'] = df.apply(calculate_naccstyr, axis=1)
 df['HLT.NACCSTYR'] = df['HLT.NACCSTYR'].apply(lambda x: 2025 - x if x not in [8888, 9999, np.nan] else x)
 cols_to_save.append('HLT.NACCSTYR')
 forma5_list.append('HLT.NACCSTYR')
 
 # CDP_MiniStroke -> CBTIA
-mapping_tia = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_tia = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.CBTIA'] = df['CDP_MiniStroke'].map(mapping_tia)
 cols_to_save.append('HLT.CBTIA')
 forma5_list.append('HLT.CBTIA')
 
 # IMH_Parkinsons -> PD
-mapping_pd = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_pd = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.PD'] = df['IMH_Parkinsons'].map(mapping_pd)
 cols_to_save.append('HLT.PD')
 forma5_list.append('HLT.PD')
@@ -478,22 +483,22 @@ def compute_parkinsons_year(row):
     if str(age_parkinsons) not in ['-9999', '-8888'] and str(visit_yr) not in ['-9999', '-8888'] and str(current_age) not in ['-9999', '-8888']:
       return int(visit_yr - (current_age - age_parkinsons))
   elif age_parkinsons == -8888:
-    return 9999
+    return np.nan
   elif age_parkinsons == -9999:
-    return 8888
-  return -4
+    return np.nan
+  return np.nan
 df['HLT.PDYR'] = df.apply(compute_parkinsons_year, axis=1)
 cols_to_save.append('HLT.PDYR')
 forma5_list.append('HLT.PDYR')
 
 # IN_Seizure -> SEIZURES
-mapping_seizure = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_seizure = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.SEIZURES'] = df['IN_Seizure'].map(mapping_seizure)
 cols_to_save.append('HLT.SEIZURES')
 forma5_list.append('HLT.SEIZURES')
 
 # IMH_TBI -> TBI
-mapping_tbi = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_tbi = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.TBI'] = df['IMH_TBI'].map(mapping_tbi)
 cols_to_save.append('HLT.TBI')
 forma5_list.append('HLT.TBI')
@@ -504,9 +509,9 @@ def calculate_tbibrief(row):
   values = [row[col] for col in tbi_columns if col in row]
   values = [v for v in values if not pd.isna(v)]
   if all(v == -9999 for v in values):
-    return -4
+    return np.nan
   if all(v in [-8888, -9999] for v in values):
-    return 9
+    return np.nan
   count_1 = sum(v == 1 for v in values)
   count_2 = sum(v == 2 for v in values)
   count_3_4 = sum(v in [3, 4] for v in values)
@@ -518,7 +523,7 @@ def calculate_tbibrief(row):
     return 2
   if count_3_4 > 0:
     return 0
-  return -4
+  return np.nan
 df['HLT.TBIBRIEF'] = df.apply(calculate_tbibrief, axis=1)
 cols_to_save.append('HLT.TBIBRIEF')
 forma5_list.append('HLT.TBIBRIEF')
@@ -529,21 +534,21 @@ def calculate_tbiexten(row):
   values = [row[col] for col in tbi_columns if col in row]
   values = [v for v in values if not pd.isna(v)]
   if all(v == -9999 for v in values):
-    return -4
+    return np.nan
   if all(v in [-9999, -8888] for v in values):
-    return 9
+    return np.nan
   count_1 = sum(v == 1 for v in values)
   count_2 = sum(v == 2 for v in values)
   count_3_4 = sum(v in [3, 4] for v in values)
   if count_1 >= 1 and count_2 == 0 and count_3_4 == 0:
     return 0
   if count_2 >= 1 and count_3_4 == 0:
-    return 9
+    return np.nan
   if count_3_4 == 1:
     return 1
   if count_3_4 > 1:
     return 2
-  return -4
+  return np.nan
 df['HLT.TBIEXTEN'] = df.apply(calculate_tbiexten, axis=1)
 cols_to_save.append('HLT.TBIEXTEN')
 forma5_list.append('HLT.TBIEXTEN')
@@ -554,14 +559,14 @@ def calculate_tbiyear(row):
   values = [row[col] for col in tbi_age_cols if col in row]
   values = [v for v in values if not pd.isna(v)]
   if all(v == -9999 for v in values):
-    return 8888
+    return np.nan
   if all(v in [-8888, -9999] for v in values):
-    return 9999
+    return np.nan
   valid_ages = [v for v in values if v not in [-8888, -9999]]
   if valid_ages:
     max_age = max(valid_ages)
     return row['VISITYR'] - (row['DEM.NACCAGE'] - max_age) if pd.notna(row['DEM.NACCAGE']) else np.nan
-  return 8888
+  return np.nan
 df['HLT.TBIYEAR'] = df.apply(calculate_tbiyear, axis=1)
 cols_to_save.append('HLT.TBIYEAR')
 forma5_list.append('HLT.TBIYEAR')
@@ -571,9 +576,9 @@ def calculate_diabetes(row):
   imh = row.get('IMH_Diabetes')
   cdx = row.get('CDX_Diabetes')
   if imh == -9999 and cdx == -9999:
-    return -4
+    return np.nan
   if (imh in [-8888, -9999]) and (cdx in [-8888, -9999]):
-    return 9
+    return np.nan
   if imh == 0 and cdx == 0:
     return 0
   if imh == 1 and cdx == 1:
@@ -582,19 +587,19 @@ def calculate_diabetes(row):
     return 0
   if (imh == 1 and cdx in [-9999, -8888]) or (cdx == 1 and imh in [-9999, -8888]):
     return 1
-  return -4
+  return np.nan
 df['HLT.DIABETES'] = df.apply(calculate_diabetes, axis=1)
 cols_to_save.append('HLT.DIABETES')
 forma5_list.append('HLT.DIABETES')
 
 # CDX_Hypertension -> HYPERTEN
-mapping_hyperten = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_hyperten = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.HYPERTENSION'] = df['CDX_Hypertension'].map(mapping_hyperten)
 cols_to_save.append('HLT.HYPERTENSION')
 forma5_list.append('HLT.HYPERTENSION')
 
 # CDX_VitaminB12 -> B12DEF
-mapping_b12 = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_b12 = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.B12DEF'] = df['CDX_VitaminB12'].map(mapping_b12)
 cols_to_save.append('HLT.B12DEF')
 forma5_list.append('HLT.B12DEF')
@@ -603,52 +608,50 @@ forma5_list.append('HLT.B12DEF')
 def calculate_thyroid(row):
   vals = [row.get('IMH_ThyroidDisease'), row.get('CDX_Hypothyroid'), row.get('CDX_Hyperthyroid')]
   if all(v == -9999 for v in vals):
-    return -4
+    return np.nan
   if all(v in [-8888, -9999] for v in vals):
-    return 9
+    return np.nan
   if 1 in vals:
     return 1
   if all(v == 0 for v in vals):
     return 0
   if all(v in [0, -8888, -9999] for v in vals):
-    return 9
-  return -4
+    return np.nan
+  return np.nan
 df['HLT.THYROID'] = df.apply(calculate_thyroid, axis=1)
 cols_to_save.append('HLT.THYROID')
 forma5_list.append('HLT.THYROID')
 
 # IMH_Arthritis -> ARTHRIT
-mapping_arthritis = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_arthritis = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.ARTHRIT'] = df['IMH_Arthritis'].map(mapping_arthritis)
 cols_to_save.append('HLT.ARTHRIT')
 forma5_list.append('HLT.ARTHRIT')
 
 # CDR_PC_SphincterControl -> INCONTU
-mapping_incontu = {0:0, 1:1, 2:1, 3:1, -9999:-4, -8888:9}
+mapping_incontu = {0:0, 1:1, 2:1, 3:1, -9999:np.nan, -8888:np.nan}
 df['HLT.INCONTU'] = df['CDR_PC_SphincterControl'].map(mapping_incontu)
 cols_to_save.append('HLT.INCONTU')
 forma5_list.append('HLT.INCONTU')
 
 # CDX_Alcohol -> ALCOHOL
-mapping_alcohol = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_alcohol = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['HLT.ALCOHOL'] = df['CDX_Alcohol'].map(mapping_alcohol)
 cols_to_save.append('HLT.ALCOHOL')
 forma5_list.append('HLT.ALCOHOL')
-
-# IMH_Depression, CDX_Depression, HI_F -> DEP2YRS
 
 # IMH_Anxiety, CDX_Anxiety -> ANXIETY
 def calculate_anxiety(row):
   vals = [row.get('IMH_Anxiety'), row.get('CDX_Anxiety')]
   if all(v == -9999 for v in vals):
-    return -4
+    return np.nan
   if all(v in [-8888, -9999] for v in vals):
-    return 9
+    return np.nan
   if 1 in vals:
     return 1
   if all(v == 0 for v in vals):
     return 0
-  return -4
+  return np.nan
 df['HLT.ANXIETY'] = df.apply(calculate_anxiety, axis=1)
 cols_to_save.append('HLT.ANXIETY')
 forma5_list.append('HLT.ANXIETY')
@@ -659,16 +662,16 @@ def calculate_tbi(row):
   values = [row[col] for col in tbi_cols if col in row]
   values = [v for v in values if not pd.isna(v)]
   if all(v == -9999 for v in values):
-    return -4
+    return np.nan
   if all(v in [-8888, -9999] for v in values):
-    return 9
+    return np.nan
   if 1 in values:
     return 1
   if all(v == 0 for v in values):
     return 0
   if all(v in [0, -8888, -9999] for v in values):
-    return 9
-  return -4
+    return np.nan
+  return np.nan
 df['HLT.NACCTBI'] = df.apply(calculate_tbi, axis=1)
 cols_to_save.append('HLT.NACCTBI')
 forma5_list.append('HLT.NACCTBI')
@@ -679,13 +682,13 @@ formb1_list = []
 # OM_Height -> HEIGHT
 def transform_height(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 88.8
+    return np.nan
   elif 36 <= value <= 87.9:
     return value
   else:
-    return -4
+    return np.nan
 df['CLIN.HEIGHT'] = df['OM_Height'].apply(transform_height)
 cols_to_save.append('CLIN.HEIGHT')
 formb1_list.append('CLIN.HEIGHT')
@@ -693,13 +696,13 @@ formb1_list.append('CLIN.HEIGHT')
 # OM_Weight -> WEIGHT
 def transform_weight(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 888
+    return np.nan
   elif 50 <= value <= 400:
     return value
   else:
-    return -4
+    return np.nan
 df['CLIN.WEIGHT'] = df['OM_Weight'].apply(transform_weight)
 cols_to_save.append('CLIN.WEIGHT')
 formb1_list.append('CLIN.WEIGHT')
@@ -707,13 +710,13 @@ formb1_list.append('CLIN.WEIGHT')
 # OM_BMI -> NACCBMI
 def transform_bmi(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 888.8
+    return np.nan
   elif 10 <= value <= 100:
     return value
   else:
-    return -4
+    return np.nan
 df['CLIN.NACCBMI'] = df['OM_BMI'].apply(transform_bmi)
 cols_to_save.append('CLIN.NACCBMI')
 formb1_list.append('CLIN.NACCBMI')
@@ -721,13 +724,13 @@ formb1_list.append('CLIN.NACCBMI')
 # OM_BP1_SYS -> BPSYS
 def transform_bp_sys(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 888
+    return np.nan
   elif 70 <= value <= 230:
     return value
   else:
-    return -4
+    return np.nan
 df['CLIN.BPSYS'] = df['OM_BP1_SYS'].apply(transform_bp_sys)
 cols_to_save.append('CLIN.BPSYS')
 formb1_list.append('CLIN.BPSYS')
@@ -735,13 +738,13 @@ formb1_list.append('CLIN.BPSYS')
 # OM_BP1_DIA -> BPDIAS
 def transform_bp_dias(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 888
+    return np.nan
   elif 30 <= value <= 140:
     return value
   else:
-    return -4
+    return np.nan
 df['CLIN.BPDIAS'] = df['OM_BP1_DIA'].apply(transform_bp_dias)
 cols_to_save.append('CLIN.BPDIAS')
 formb1_list.append('CLIN.BPDIAS')
@@ -775,16 +778,16 @@ def calculate_hrate(p1, p2):
   if p1 not in [-9999, -8888] and p2 in [-9999, -8888]:
     return p1
   if p1 == -9999 and p2 == -9999:
-    return -4
+    return np.nan
   if (p1 in [-9999, -8888]) and {p2 in [-9999, -8888]}:
-    return 9
-  return -4
+    return np.nan
+  return np.nan
 df['CLIN.HRATE'] = df.apply(lambda row: calculate_hrate(row['OM_Pulse1'], row['OM_Pulse2']), axis=1)
 cols_to_save.append('CLIN.HRATE')
 formb1_list.append('CLIN.HRATE')
 
 # Visual_1 -> VISCORR
-mapping_viscorr = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_viscorr = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.VISCORR'] = df['Visual_1'].map(mapping_viscorr)
 cols_to_save.append('CLIN.VISCORR')
 formb1_list.append('CLIN.VISCORR')
@@ -792,27 +795,27 @@ formb1_list.append('CLIN.VISCORR')
 # Visual_1 -> VISION
 def calculate_vision(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 9
+    return np.nan
   elif value == 0:
     return 1
   elif value == 1:
     return 0
   else:
-    return -4
+    return np.nan
 df['CLIN.VISION'] = df.apply(lambda row: calculate_vision(row['CLIN.VISCORR']), axis=1)
 cols_to_save.append('CLIN.VISION')
 formb1_list.append('CLIN.VISION')
 
 # Visual_3 -> VISWCORR
-mapping_viswcorr = {1:0, 2:1, 3:1, -9999:-4, -8888:9}
+mapping_viswcorr = {1:0, 2:1, 3:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.VISWCORR'] = df['Visual_3'].map(mapping_viswcorr)
 cols_to_save.append('CLIN.VISWCORR')
 formb1_list.append('CLIN.VISWCORR')
 
 # Auditory_1 -> HEARAID
-mapping_hearaid = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_hearaid = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.HEARAID'] = df['Auditory_1'].map(mapping_hearaid)
 cols_to_save.append('CLIN.HEARAID')
 formb1_list.append('CLIN.HEARAID')
@@ -820,21 +823,21 @@ formb1_list.append('CLIN.HEARAID')
 # Auditory_1 -> HEARING
 def calculate_hearing(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 9
+    return np.nan
   elif value == 0:
     return 1
   elif value == 1:
     return 0
   else:
-    return -4
+    return np.nan
 df['CLIN.HEARING'] = df.apply(lambda row: calculate_hearing(row['CLIN.HEARAID']), axis=1)
 cols_to_save.append('CLIN.HEARING')
 formb1_list.append('CLIN.HEARING')
 
 # Auditory_3 -> HEARWAID
-mapping_hearwaid = {1:0, 2:1, 3:1, 4:1, -9999:-4, -8888:9}
+mapping_hearwaid = {1:0, 2:1, 3:1, 4:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.HEARWAID'] = df['Auditory_3'].map(mapping_hearwaid)
 cols_to_save.append('CLIN.HEARWAID')
 formb1_list.append('CLIN.HEARWAID')
@@ -843,49 +846,49 @@ formb1_list.append('CLIN.HEARWAID')
 formb2_list = []
 
 # HI_A -> ABRUPT
-mapping_abrupt = {0:0, 1:2, 2:2, -9999:-4, -8888:9}
+mapping_abrupt = {0:0, 1:2, 2:2, -9999:np.nan, -8888:np.nan}
 df['CLIN.ABRUPT'] = df['HI_A'].map(mapping_abrupt)
 cols_to_save.append('CLIN.ABRUPT')
 formb2_list.append('CLIN.ABRUPT')
 
 # HI_B -> STEPWISE
-mapping_stepwise = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_stepwise = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.STEPWISE'] = df['HI_B'].map(mapping_stepwise)
 cols_to_save.append('CLIN.STEPWISE')
 formb2_list.append('CLIN.STEPWISE')
 
 # HI_G -> SOMATIC
-mapping_somatic = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_somatic = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.SOMATIC'] = df['HI_G'].map(mapping_somatic)
 cols_to_save.append('CLIN.SOMATIC')
 formb2_list.append('CLIN.SOMATIC')
 
 # HI_H -> EMOT
-mapping_emot = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_emot = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.EMOT'] = df['HI_H'].map(mapping_emot)
 cols_to_save.append('CLIN.EMOT')
 formb2_list.append('CLIN.EMOT')
 
 # HI_I -> HXHYPER
-mapping_hxhyper = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_hxhyper = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.HXHYPER'] = df['HI_I'].map(mapping_hxhyper)
 cols_to_save.append('CLIN.HXHYPER')
 formb2_list.append('CLIN.HXHYPER')
 
 # HI_J -> HXSTROKE
-mapping_hxstroke = {0:0, 1:2, 2:2, -9999:-4, -8888:9}
+mapping_hxstroke = {0:0, 1:2, 2:2, -9999:np.nan, -8888:np.nan}
 df['CLIN.HXSTROKE'] = df['HI_J'].map(mapping_hxstroke)
 cols_to_save.append('CLIN.HXSTROKE')
 formb2_list.append('CLIN.HXSTROKE')
 
 # HI_L -> FOCLSYM
-mapping_focls = {0:0, 1:2, -9999:-4, -8888:9}
+mapping_focls = {0:0, 1:2, -9999:np.nan, -8888:np.nan}
 df['CLIN.FOCLSYM'] = df['HI_L'].map(mapping_focls)
 cols_to_save.append('CLIN.FOCLSYM')
 formb2_list.append('CLIN.FOCLSYM')
 
 # HI_M -> FOCLSIGN
-mapping_focls = {0:0, 1:2, -9999:-4, -8888:9}
+mapping_focls = {0:0, 1:2, -9999:np.nan, -8888:np.nan}
 df['CLIN.FOCLSIGN'] = df['HI_M'].map(mapping_focls)
 cols_to_save.append('CLIN.FOCLSIGN')
 formb2_list.append('CLIN.FOCLSIGN')
@@ -893,19 +896,19 @@ formb2_list.append('CLIN.FOCLSIGN')
 # HI_Score -> HACHIN
 def transform_hiscore(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 9
+    return np.nan
   elif 0 <= value <= 12:
     return value
   else:
-    return -4
+    return np.nan
 df['CLIN.HACHIN'] = df['HI_Score'].apply(transform_hiscore)
 cols_to_save.append('CLIN.HACHIN')
 formb2_list.append('CLIN.HACHIN')
 
 # IMH_VaD -> CVDCOG
-mapping_cvdcog = {0:0, 1:1, -9999:8, -8888:-4}
+mapping_cvdcog = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.CVDCOG'] = df['IMH_VaD'].map(mapping_cvdcog)
 cols_to_save.append('CLIN.CVDCOG')
 formb2_list.append('CLIN.CVDCOG')
@@ -937,7 +940,7 @@ def transform_stand_failed(value):
   elif value == 6:
     return 'Other'
   else:
-    return -4
+    return np.nan
 df['CLIN.ARISINGX'] = df['Single_Chair_Stand_Failed'].apply(transform_stand_failed)
 cols_to_save.append('CLIN.ARISINGX')
 formb3_list.append('CLIN.ARISINGX')
@@ -948,12 +951,12 @@ aid2 = df['Aids_For_Second_Walk']
 def transform_aids(aid1, aid2):
   aids = [aid1, aid2]
   if all(aid == -9999 for aid in aids):
-    return -4
+    return np.nan
   if all(aid in [-8888, -9999] for aid in aids):
-    return 8
+    return np.nan
   clean_aids = [a for a in aids if a not in [-9999, -8888]]
   if not clean_aids:
-    return 8
+    return np.nan
   if all(a == 0 for a in clean_aids):
     return 0
   if all(a in [0, 1] for a in clean_aids):
@@ -962,7 +965,7 @@ def transform_aids(aid1, aid2):
     return 2
   if any(a == 2 for a in clean_aids):
     return 3
-  return -4
+  return np.nan
 df['CLIN.GAIT'] = df.apply(lambda row: transform_aids(row['Aids_For_First_Walk'], row['Aids_For_Second_Walk']), axis=1)
 cols_to_save.append('CLIN.GAIT')
 formb3_list.append('CLIN.GAIT')
@@ -1033,7 +1036,7 @@ df['COG.CDRGLOB'] = df['CDR_Global']
 cols_to_save.append('COG.CDRGLOB')
 
 # CDR_J_SocialBehavior -> COMPORT
-mapping_comport = {1:0, 2:2, 3:1, 4:0.5, -9999:-4, -8888:-4}
+mapping_comport = {1:0, 2:2, 3:1, 4:0.5, -9999:np.nan, -8888:np.nan}
 df['COG.COMPORT'] = df['CDR_J_SocialBehavior'].map(mapping_comport)
 cols_to_save.append('COG.COMPORT')
 
@@ -1045,17 +1048,17 @@ dep3 = df['HI_F']
 def transform_depd(dep1, dep2, dep3):
   deps = [dep1, dep2, dep3]
   if all(deps == -9999 for dep in deps):
-    return -4
+    return np.nan
   if all(dep in [-8888, -9999] for dep in deps):
-    return 9
+    return np.nan
   clean_deps = [d for d in deps if d not in [-9999, -8888]]
   if not clean_deps:
-    return 9
+    return np.nan
   if all(d == 0 for d in clean_deps):
     return 0
   if all(d in [0, 1] for d in clean_deps):
     return 1
-  return -4
+  return np.nan
 df['COG.DEPD'] = df.apply(lambda row: transform_depd(row['CDX_Depression'], row['IMH_Depression'], row['HI_F']), axis=1)
 cols_to_save.append('COG.DEPD')
 
@@ -1063,18 +1066,18 @@ cols_to_save.append('COG.DEPD')
 gds_cat = df['GDS_Category']
 def transform_depdsev(gds_cat):
   if gds_cat == -9999:
-    return -4
+    return np.nan
   elif gds_cat == -8888:
-    return 9
+    return np.nan
   elif gds_cat == 'Normal':
-    return 8
+    return 0
   elif gds_cat == 'Mild Depressive':
     return 1
   elif gds_cat == 'Moderate Depressive':
     return 2
   elif gds_cat == 'Severe Depressive':
     return 3
-  return -4
+  return np.nan
 df['COG.DEPDSEV'] = df['GDS_Category'].apply(transform_depdsev)
 cols_to_save.append('COG.DEPDSEV')
 
@@ -1082,48 +1085,48 @@ cols_to_save.append('COG.DEPDSEV')
 def calculate_anxiety(row):
   vals = [row.get('IMH_Anxiety'), row.get('CDX_Anxiety')]
   if all(v == -9999 for v in vals):
-    return -4
+    return np.nan
   if all(v in [-8888, -9999] for v in vals):
-    return 9
+    return np.nan
   if 1 in vals:
     return 1
   if all(v == 0 for v in vals):
     return 0
-  return -4
+  return np.nan
 df['COG.ANX'] = df.apply(calculate_anxiety, axis=1)
 cols_to_save.append('COG.ANX')
 
 # GDS_9 -> ELAT
-mapping_elat = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_elat = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['COG.ELAT'] = df['GDS_9'].map(mapping_elat)
 cols_to_save.append('COG.ELAT')
 
 # GDS_Score_A -> APA
 def transform_apa(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 9
+    return np.nan
   elif value == 0:
     return 0
   else:
     return 1
-  return -4
+  return np.nan
 df['COG.APA'] = df['GDS_Score_A'].apply(transform_apa)
 cols_to_save.append('COG.APA')
 
 # PED_4_C -> IRR
-mapping_irr = {0:0, 1:1, 3:9, -9999:-4, -8888:9}
+mapping_irr = {0:0, 1:1, 3:9, -9999:np.nan, -8888:np.nan}
 df['COG.IRR'] = df['PED_4_C'].map(mapping_irr)
 cols_to_save.append('COG.IRR')
 
 # CDR_PC_EatingHabits -> APP
-mapping_app = {0:0, 1:1, 2:1, 3:1, -9999:-4, -8888:9}
+mapping_app = {0:0, 1:1, 2:1, 3:1, -9999:np.nan, -8888:np.nan}
 df['COG.APP'] = df['CDR_PC_EatingHabits'].map(mapping_app)
 cols_to_save.append('COG.APP')
 
 # CDP_PC_EatingHabits -> APPSEV
-mapping_appsev = {0:8, 1:1, 2:2, 3:3, -9999:-4, -8888:9}
+mapping_appsev = {0:8, 1:1, 2:2, 3:3, -9999:np.nan, -8888:np.nan}
 df['COG.APPSEV'] = df['CDR_PC_EatingHabits'].map(mapping_appsev)
 cols_to_save.append('COG.APPSEV')
 
@@ -1131,13 +1134,13 @@ cols_to_save.append('COG.APPSEV')
 formb6_list = []
 
 # GDS_1 -> SATIS
-mapping_gds1 = {0:1, 1:0, -9999:-4, -8888:9}
+mapping_gds1 = {0:1, 1:0, -9999:np.nan, -8888:np.nan}
 df['CLIN.SATIS'] = df['GDS_1'].map(mapping_gds1)
 cols_to_save.append('CLIN.SATIS')
 formb6_list.append('CLIN.SATIS')
 
 # GDS_2 -> DROPACT
-mapping_gds = {0:0, 1:1, -9999:-4, -8888:9}
+mapping_gds = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.DROPACT'] = df['GDS_2'].map(mapping_gds)
 cols_to_save.append('CLIN.DROPACT')
 formb6_list.append('CLIN.DROPACT')
@@ -1210,12 +1213,12 @@ formb6_list.append('CLIN.BETTER')
 # GDS_Total -> NACCGDS
 def transform_gdstotal(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 88
+    return np.nan
   else:
     return value
-  return -4
+  return np.nan
 df['CLIN.NACCGDS'] = df['GDS_Total'].apply(transform_gdstotal)
 cols_to_save.append('CLIN.NACCGDS')
 formb6_list.append('CLIN.NACCGDS')
@@ -1227,7 +1230,7 @@ formb6_list.append('CLIN.NACCGDS')
 formb8_list = []
 
 # HI_M -> SIVDFIND
-mapping_sivdfind = {0:0, 1:1, -9999:-4, -8888:8}
+mapping_sivdfind = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.SIVDFIND'] = df['HI_M'].map(mapping_sivdfind)
 cols_to_save.append('CLIN.SIVDFIND')
 formb8_list.append('CLIN.SIVDFIND')
@@ -1236,31 +1239,31 @@ formb8_list.append('CLIN.SIVDFIND')
 formb9_list = []
 
 # CDR_M_PastYearDecline -> DECSUB
-mapping_decsub = {0:0, 1:1, -9999:9, -8888:8}
+mapping_decsub = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.DECSUB'] = df['CDR_M_PastYearDecline'].map(mapping_decsub)
 cols_to_save.append('CLIN.DECSUB')
 formb9_list.append('CLIN.DECSUB')
 
 # CDR_M_PastYearDecline -> DECIN
-mapping_decin = {0:0, 1:1, -9999:9, -8888:8}
+mapping_decin = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.DECIN'] = df['CDR_M_PastYearDecline'].map(mapping_decin)
 cols_to_save.append('CLIN.DECIN')
 formb9_list.append('CLIN.DECIN')
 
 # CDX_Ipm -> DECCLCOG
-mapping_decclcog = {0:0, 1:1, -9999:-4, -8888:-4}
+mapping_decclcog = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.DECCLCOG'] = df['CDX_Ipm'].map(mapping_decclcog)
 cols_to_save.append('CLIN.DECCLCOG')
 formb9_list.append('CLIN.DECCLCOG')
 
 # CDX_Cog -> COGMEM
-mapping_cogmem = {0:0, 1:1, 2:1, 9:9, -9999:9, -8888:9}
+mapping_cogmem = {0:0, 1:1, 2:1, 9:np.nan, -9999:np.nan, -8888:np.nan}
 df['CLIN.COGMEM'] = df['CDX_Cog'].map(mapping_cogmem)
 cols_to_save.append('CLIN.COGMEM')
 formb9_list.append('CLIN.COGMEM')
 
 # HI_C -> COGFLUC
-mapping_cogfluc = {0:0, 2:1, -9999:-4, -8888:9}
+mapping_cogfluc = {0:0, 2:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.COGFLUC'] = df['HI_C'].map(mapping_cogfluc)
 cols_to_save.append('CLIN.COGFLUC')
 formb9_list.append('CLIN.COGFLUC')
@@ -1268,28 +1271,26 @@ formb9_list.append('CLIN.COGFLUC')
 # GDS_Score_A ->BEAPATHY
 def transform_gds_a(value):
   if value == -9999:
-    return 9
+    return np.nan
   elif value == -8888:
-    return 9
+    return np.nan
   elif value == 0:
     return 0
   else:
     return 1
-  return -4
+  return np.nan
 df['CLIN.BEAPATHY'] = df['GDS_Score_A'].apply(transform_gds_a)
 cols_to_save.append('CLIN.BEAPATHY')
 formb9_list.append('CLIN.BEAPATHY')
-
-# IMH_Depression, CDX_Depression, HI_F -> BEDEP
 
 ## Forms C1, C2, C2T: Neuropsychological Battery Summary Scores
 # MMSE_(1-5) -> MMSEORDA
 def transform_mmseorda(row):
   mmse_vals = [row[f'MMSE_{i}'] for i in range(1, 6)]
   if all(val == -9999 for val in mmse_vals):
-    return -4
+    return np.nan
   if all(val in [-8888, -9999] for val in mmse_vals):
-    return 98
+    return np.nan
   valid_vals = [val for val in mmse_vals if val in [0, 1]]
   return sum(valid_vals)
 df['COG.MMSEORDA'] = df.apply(transform_mmseorda, axis=1)
@@ -1299,42 +1300,42 @@ cols_to_save.append('COG.MMSEORDA')
 def transform_mmseorlo(row):
   mmse_vals = [row[f'MMSE_{i}'] for i in range(6, 11)]
   if all(val == -9999 for val in mmse_vals):
-    return -4
+    return np.nan
   if all(val in [-8888, -9999] for val in mmse_vals):
-    return 98
+    return np.nan
   valid_vals = [val for val in mmse_vals if val in [0, 1]]
   return sum(valid_vals)
 df['COG.MMSEORLO'] = df.apply(transform_mmseorlo, axis=1)
 cols_to_save.append('COG.MMSEORLO')
 
 # MMSE_19 -> PENTAGON
-mapping_pentagon = {0:0, 1:1, -9999:-4, -8888:98}
+mapping_pentagon = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['COG.PENTAGON'] = df['MMSE_19'].map(mapping_pentagon)
 cols_to_save.append('COG.PENTAGON')
 
 # MMSE_Total -> NACCMMSE
 def transform_naccmmse(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 98
+    return np.nan
   else:
     return value
-  return -4
+  return np.nan
 df['COG.NACCMMSE'] = df['MMSE_Total'].apply(transform_naccmmse)
 cols_to_save.append('COG.NACCMMSE')
 
 # DSF_Total -> DIGIF
 def transform_digifb(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 98
+    return np.nan
   elif 0 <= value <= 12:
     return value
   else:
-    return -4
-  return -4
+    return np.nan
+  return np.nan
 df['COG.DIGIF'] = df['DSF_Total'].apply(transform_digifb)
 cols_to_save.append('COG.DIGIF')
 
@@ -1345,90 +1346,90 @@ cols_to_save.append('COG.DIGIB')
 # Animal_Total -> ANIMALS
 def transform_animals(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 98
+    return np.nan
   else:
     return value
-  return -4
+  return np.nan
 df['COG.ANIMALS'] = df['Animal_Total'].apply(transform_animals)
 cols_to_save.append('COG.ANIMALS')
 
 # Trails_A_Time -> TRAILA
 def transform_traila(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 998
+    return np.nan
   elif value <= 150:
     return value
   elif value > 150:
     return 150
   else:
-    return -4
+    return np.nan
 df['COG.TRAILA'] = df['Trails_A_Time'].apply(transform_traila)
 cols_to_save.append('COG.TRAILA')
 
 # Trails_A_Errors -> TRAILARR
 def transform_trailarr(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 98
+    return np.nan
   else:
     return value
-  return -4
+  return np.nan
 df['COG.TRAILARR'] = df['Trails_A_Errors'].apply(transform_trailarr)
 cols_to_save.append('COG.TRAILARR')
 
 # Trails_B_Time -> TRAILB
 def transform_trailb(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 998
+    return np.nan
   elif value <= 300:
     return value
   elif value > 300:
     return 300
   else:
-    return -4
+    return np.nan
 df['COG.TRAILB'] = df['Trails_B_Time'].apply(transform_trailb)
 cols_to_save.append('COG.TRAILB')
 
 # Trails_B_Errors -> TRAILBRR
 def transform_trailbrr(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 98
+    return np.nan
   else:
     return value
-  return -4
+  return np.nan
 df['COG.TRAILBRR'] = df['Trails_B_Errors'].apply(transform_trailbrr)
 cols_to_save.append('COG.TRAILBRR')
 
 # Digit_Symbol_Substitution -> WAIS
 def transform_wais(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 98
+    return np.nan
   else:
     return value
-  return -4
+  return np.nan
 df['COG.WAIS'] = df['Digit_Symbol_Substitution'].apply(transform_wais)
 cols_to_save.append('COG.WAIS')
 
 # FAS_Count_F -> UDSVERFC
 def transform_udsverfc(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return 98
+    return np.nan
   else:
     return value
-  return -4
+  return np.nan
 df['COG.UDSVERFC'] = df['FAS_Count_F'].apply(transform_udsverfc)
 cols_to_save.append('COG.UDSVERFC')
 
@@ -1436,19 +1437,19 @@ cols_to_save.append('COG.UDSVERFC')
 formd1_list = []
 
 # CDX_Cog -> NACCUDSD
-mapping_naccudsd = {0:1, 1:2, 2:4, 9:-4, -9999:-4, -8888:-4}
+mapping_naccudsd = {0:1, 1:2, 2:4, 9:np.nan, -9999:np.nan, -8888:np.nan}
 df['CLIN.NACCUDSD'] = df['CDX_Cog'].map(mapping_naccudsd)
 cols_to_save.append('CLIN.NACCUDSD')
 formd1_list.append('CLIN.NACCUDSD')
 
 # IMH_FTD -> NACCBVFT
-mapping_naccbvft = {0:0, 1:1, -9999:-4, -8888:-4}
+mapping_naccbvft = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.NACCBVFT'] = df['IMH_FTD'].map(mapping_naccbvft)
 cols_to_save.append('CLIN.NACCBVFT')
 formd1_list.append('CLIN.NACCBVFT')
 
 # IMH_Lewybodies -> NACCLBDS
-mapping_nacclbds = {0:0, 1:1, -9999:-4, -8888:-4}
+mapping_nacclbds = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.NACCLBDS'] = df['IMH_Lewybodies'].map(mapping_nacclbds)
 cols_to_save.append('CLIN.NACCLBDS')
 formd1_list.append('CLIN.NACCLBDS')
@@ -1456,21 +1457,21 @@ formd1_list.append('CLIN.NACCLBDS')
 # IMH_Dementia_Other_1Type -> NAMNDEM
 def transform_dementia(value):
   if value == -9999:
-    return -4
+    return np.nan
   elif value == -8888:
-    return -4
+    return np.nan
   elif value == 0:
     return 0
   elif value == 1:
     return 1
   else:
-    return -4
+    return np.nan
 df['CLIN.NAMDEM'] = df['IMH_Dementia_Other_1Type'].apply(transform_dementia)
 cols_to_save.append('CLIN.NAMDEM')
 formd1_list.append('CLIN.NAMDEM')
 
 # CDX_CVD -> CVD
-mapping_cvd = {0:0, 1:1, -9999:-4, -8888:-4}
+mapping_cvd = {0:0, 1:1, -9999:np.nan, -8888:np.nan}
 df['CLIN.CVD'] = df['CDX_CVD'].map(mapping_cvd)
 cols_to_save.append('CLIN.CVD')
 formd1_list.append('CLIN.CVD')
@@ -1484,7 +1485,7 @@ formd1_list.append('CLIN.ALCABUSE')
 formd2_list = []
 
 # IMH_Cancer -> CANCER
-mapping_cancer = {0:0, 1:2, -9999:-4, -8888:8}
+mapping_cancer = {0:0, 1:2, -9999:np.nan, -8888:np.nan}
 df['CLIN.CANCER'] = df['IMH_Cancer'].map(mapping_cancer)
 cols_to_save.append('CLIN.CANCER')
 formd2_list.append('CLIN.CANCER')
@@ -1592,9 +1593,9 @@ def transform_hypert(row):
   hi = row['CLIN.HXHYPER']
   cdx = row['HLT.HYPERTENSION']
   if hi == -9999 and cdx == -9999:
-    return -4
+    return np.nan
   elif (hi == -8888 and cdx == -8888) or ({hi, cdx} == {-8888, -9999}):
-    return 8
+    return np.nan
   elif hi in [-9999, -8888] and cdx in [0, 1]:
     return cdx
   elif cdx in [-9999, -8888] and hi in [0, 1]:
@@ -1604,7 +1605,7 @@ def transform_hypert(row):
   elif hi in [0, 1] and cdx in [0, 1]:
     return 1
   else:
-    return -4
+    return np.nan
 df['CLIN.HYPERT'] = df.apply(transform_hypert, axis=1)
 cols_to_save.append('CLIN.HYPERT')
 formd2_list.append('CLIN.HYPERT')
