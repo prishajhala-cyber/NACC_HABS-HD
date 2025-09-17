@@ -385,6 +385,7 @@ forma5_list.append('HLT.PACKSPER')
 
 # SubstanceUse_Smoke_EndAge -> QUITSMOK
 df['HLT.QUITSMOK'] = df['SubstanceUse_Smoke_EndAge']
+df['HLT.QUITSMOK'] = df['HLT.QUITSMOK'].replace(general_map)
 cols_to_save.append('HLT.QUITSMOK')
 forma5_list.append('HLT.QUITSMOK')
 
@@ -553,7 +554,7 @@ df['HLT.TBIEXTEN'] = df.apply(calculate_tbiexten, axis=1)
 cols_to_save.append('HLT.TBIEXTEN')
 forma5_list.append('HLT.TBIEXTEN')
 
-# OSU_TBI_(1-5)_(1-5)_Age -> TBIYEAR
+# OSU_TBI_(1-5)_Age -> TBIYEAR
 tbi_age_cols = [f'OSU_TBI_{i}_{j}_Age' for i in range(1, 6) for j in range(1, 6)]
 def calculate_tbiyear(row):
   values = [row[col] for col in tbi_age_cols if col in row]
@@ -565,7 +566,7 @@ def calculate_tbiyear(row):
   valid_ages = [v for v in values if v not in [-8888, -9999]]
   if valid_ages:
     max_age = max(valid_ages)
-    return row['VISITYR'] - (row['DEM.NACCAGE'] - max_age) if pd.notna(row['DEM.NACCAGE']) else np.nan
+    return round(row['VISITYR'] - (row['DEM.NACCAGE'] - max_age)) if pd.notna(row['DEM.NACCAGE']) else np.nan
   return np.nan
 df['HLT.TBIYEAR'] = df.apply(calculate_tbiyear, axis=1)
 cols_to_save.append('HLT.TBIYEAR')
@@ -1494,7 +1495,7 @@ formd2_list.append('CLIN.CANCER')
 df['CLIN.CANCSITE'] = df['IMH_CancerType'].replace(-9999, 'Not applicable')
 def clean_cancer_location(value):
   if value == 'Not applicable' or pd.isna(value):
-    return value
+    return np.nan
   val = str(value).lower().strip()
   if re.search(r'breast', val):
     return 'Breast'
@@ -1577,8 +1578,8 @@ def clean_cancer_location(value):
   elif re.search(r'pulmonary', val):
     return 'Lung'
   else:
-    return 'Not applicable'
-  return 'Not applicable'
+    return np.nan
+  return np.nan
 df['CLIN.CANCSITE'] = df['IMH_CancerType'].apply(clean_cancer_location)
 cols_to_save.append('CLIN.CANCSITE')
 formd2_list.append('CLIN.CANCSITE')
@@ -1640,17 +1641,17 @@ new_df.to_excel(output_path, index=False)
 
 """# **Prompt Generation**"""
 
-print(form1_list)
-print(forma1_list)
-print(forma2_list)
-print(forma3_list)
-print(forma4_list)
-print(forma5_list)
-print(formb1_list)
-print(formb2_list)
-print(formb3_list)
-print(formb6_list)
-print(formb8_list)
-print(formb9_list)
-print(formd1_list)
-print(formd2_list)
+# print(form1_list)
+# print(forma1_list)
+# print(forma2_list)
+# print(forma3_list)
+# print(forma4_list)
+# print(forma5_list)
+# print(formb1_list)
+# print(formb2_list)
+# print(formb3_list)
+# print(formb6_list)
+# print(formb8_list)
+# print(formb9_list)
+# print(formd1_list)
+# print(formd2_list)
