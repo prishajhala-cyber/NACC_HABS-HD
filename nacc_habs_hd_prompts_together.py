@@ -41,11 +41,11 @@ for idx, row in df.iterrows():
   day = row['VISITDAY']
   year = row['VISITYR']
   date_str = None
-  if isinstance(month, (int, float)) and 1 <= month <= 12:
+  if pd.notna(month) and isinstance(month, (int, float)) and 1 <= month <= 12:
     month_name = calendar.month_name[int(month)]
-    if isinstance(day, (int, float)) and 1 <= day <= 31 and isinstance(year, (int, float)) and 2017 <= year <= 2024:
+    if pd.notna(day) and isinstance(day, (int, float)) and 1 <= day <= 31 and pd.notna(year) and isinstance(year, (int, float)) and 2017 <= year <= 2024:
       date_str = f"{month_name} {int(day)}, {int(year)}"
-    elif isinstance(year, (int, float)) and 2017 <= year <= 2024:
+    elif pd.notna(year) and isinstance(year, (int, float)) and 2017 <= year <= 2024:
       date_str = f"{month_name}, {int(year)}"
     else:
       date_str = month_name
@@ -53,13 +53,13 @@ for idx, row in df.iterrows():
   # NACCVNUM
   visit_num = row['NACCVNUM']
   visit_num_str = None
-  if isinstance(visit_num, (int, float)) and int(visit_num) in mapping_num:
+  if pd.notna(visit_num) and isinstance(visit_num, (int, float)) and int(visit_num) in mapping_num:
     visit_num_str = mapping_num[int(visit_num)]
 
   # MIL.NACCAVST
   total_visits = row['MIL.NACCAVST']
   total_visits_str = None
-  if isinstance(total_visits, (int, float)) and int(total_visits) in mapping_visits:
+  if pd.notna(total_visits) and isinstance(total_visits, (int, float)) and int(total_visits) in mapping_visits:
     if int(total_visits) == 1:
       total_visits_str = f"{mapping_visits[int(total_visits)]} time"
     else:
@@ -68,7 +68,7 @@ for idx, row in df.iterrows():
   # MIL.NACCNVST
   in_person_visit = row['MIL.NACCNVST']
   in_person_visit_str = None
-  if isinstance(in_person_visit, (int, float)) and int(in_person_visit) in mapping_visits:
+  if pd.notna(in_person_visit) and isinstance(in_person_visit, (int, float)) and int(in_person_visit) in mapping_visits:
     in_person_visit_str = f"{mapping_visits[int(in_person_visit)]} in-person visit(s)"
 
   # Natural Language
@@ -120,15 +120,15 @@ for idx, row in df.iterrows():
 
   # DEM.NACCREFR
   refr_source = row['DEM.NACCREFR']
-  if isinstance(refr_source, (int, float)) and int(refr_source) in mapping_refr:
+  if pd.notna(refr_source) and isinstance(refr_source, (int, float)) and int(refr_source) in mapping_refr:
     parts.append(f"They first came to the study through a {mapping_refr[int(refr_source)]}.")
 
   # Age, ethnicity, race
   age_source = row['DEM.NACCAGE']
-  hispanic = (isinstance(row['DEM.HISPANIC'], (int, float)) and int(row['DEM.HISPANIC']) == 1)
+  hispanic = (pd.notna(row['DEM.HISPANIC']) and isinstance(row['DEM.HISPANIC'], (int, float)) and int(row['DEM.HISPANIC']) == 1)
   hispor = None
   hispor_source = row['DEM.HISPOR']
-  if isinstance(hispor_source, (int, float)) and int(hispor_source) in mapping_hispor:
+  if pd.notna(hispor_source) and isinstance(hispor_source, (int, float)) and int(hispor_source) in mapping_hispor:
     hispor = mapping_hispor[int(hispor_source)]
   elif hispanic:
     hisporx = get_hisporx(row['DEM.HISPORX'])
@@ -136,9 +136,9 @@ for idx, row in df.iterrows():
       hispor = hisporx
 
   race_source = row['DEM.RACE']
-  race = mapping_race[int(race_source)] if isinstance(race_source, (int, float)) and int(race_source) in mapping_race else None
+  race = mapping_race[int(race_source)] if pd.notna(race_source) and isinstance(race_source, (int, float)) and int(race_source) in mapping_race else None
 
-  if isinstance(age_source, (int, float)) and int(age_source) > 0:
+  if pd.notna(age_source) and isinstance(age_source, (int, float)) and int(age_source) > 0:
     age = int(age_source)
     if hispanic and hispor and race:
       parts.append(f"They are {age} years old, and they identify as Hispanic of {hispor} heritage and as {race}.")
@@ -151,13 +151,13 @@ for idx, row in df.iterrows():
 
   # Language, education, marital status
   lang_source = row['DEM.PRIMLANG']
-  lang = mapping_primlang[int(lang_source)] if isinstance(lang_source, (int, float)) and int(lang_source) in mapping_primlang else None
+  lang = mapping_primlang[int(lang_source)] if pd.notna(lang_source) and isinstance(lang_source, (int, float)) and int(lang_source) in mapping_primlang else None
 
   educ_source = row['DEM.EDUC']
-  educ = int(educ_source) if isinstance(educ_source, (int, float)) and int(educ_source) > 0 else None
+  educ = int(educ_source) if pd.notna(educ_source) and isinstance(educ_source, (int, float)) and int(educ_source) > 0 else None
 
   marital_source = row['DEM.MARISTAT']
-  marital = mapping_maristat[int(marital_source)] if isinstance(marital_source, (int, float)) and int(marital_source) in mapping_maristat else None
+  marital = mapping_maristat[int(marital_source)] if pd.notna(marital_source) and isinstance(marital_source, (int, float)) and int(marital_source) in mapping_maristat else None
 
   if lang and educ and marital:
     parts.append(f"Their primary language is {lang}, they have completed {educ} years of education, and are currently {marital}.")
@@ -176,7 +176,7 @@ for idx, row in df.iterrows():
 
   # Independence
   independ_source = row['DEM.INDEPEND']
-  if isinstance(independ_source, (int, float)) and int(independ_source) in mapping_independ:
+  if pd.notna(independ_source) and isinstance(independ_source, (int, float)) and int(independ_source) in mapping_independ:
     parts.append(f"In terms of daily life, they {mapping_independ[int(independ_source)]}.")
 
   paragrapha1 = " ".join(parts)
@@ -225,35 +225,35 @@ for idx, row in df.iterrows():
 
   # Gender and pronouns
   insex = row.get('CODEM.INSEX', None)
-  if isinstance(insex, (int, float)) and int(insex) in mapping_insex:
+  if pd.notna(insex) and isinstance(insex, (int, float)) and int(insex) in mapping_insex:
     gender = mapping_insex[int(insex)]
     pronoun = 'he' if gender == 'male' else 'she'
     possessive = 'his' if gender == 'male' else 'her'
 
   # Gender and birth year
   birth_year = row.get('CODEM.INFIRYR', None)
-  if pronoun and isinstance(birth_year, (int, float)) and birth_year > 0:
+  if pronoun and pd.notna(birth_year) and isinstance(birth_year, (int, float)) and birth_year > 0:
     parts.append(f"The co-participant is {gender} and was born in {int(birth_year)}.")
   elif pronoun:
     parts.append(f"The co-participant is {gender}.")
-  elif isinstance(birth_year, (int, float)) and birth_year > 0:
+  elif pd.notna(birth_year) and isinstance(birth_year, (int, float)) and birth_year > 0:
     parts.append(f"The co-participant was born in {int(birth_year)}.")
 
   # Heritage and race
   heritage_bits = []
   inhisp = row.get('CODEM.INHISP', None)
-  if isinstance(inhisp, (int, float)) and inhisp == 1:
+  if pd.notna(inhisp) and isinstance(inhisp, (int, float)) and int(inhisp) == 1:
     heritage_bits.append("Hispanic")
 
   inhispor = row.get('CODEM.INHISPOR', None)
-  if isinstance(inhispor, (int, float)) and inhispor in mapping_inhispor:
+  if pd.notna(inhispor) and isinstance(inhispor, (int, float)) and int(inhispor) in mapping_inhispor:
     heritage_bits.append(f"with roots in {mapping_inhispor[int(inhispor)]}.")
   else:
     get_inhisporx(row.get('CODEM.INHISPOX', None), heritage_bits, pronoun)
 
   race_bits = []
   inrace = row.get('CODEM.INRACE', None)
-  if isinstance(inrace, (int, float)) and inrace in mapping_inrace:
+  if pd.notna(inrace) and isinstance(inrace, (int, float)) and int(inrace) in mapping_inrace:
     race_bits.append(mapping_inrace[int(inrace)])
   else:
     get_inracex(row.get('CODEM.INRACEX', None), race_bits, pronoun)
@@ -268,8 +268,8 @@ for idx, row in df.iterrows():
   # Education and relationship
   edu = row.get('CODEM.INEDUC', None)
   relto = row.get('CODEM.INRELTO', None)
-  edu_txt = f"has completed {int(edu)} years of education" if isinstance(edu, (int, float)) and edu > 0 else None
-  rel_txt = f"is the subject's {mapping_inrelto[int(relto)]}" if isinstance(relto, (int, float)) and int(relto) in mapping_inrelto else None
+  edu_txt = f"has completed {int(edu)} years of education" if pd.notna(edu) and isinstance(edu, (int, float)) and edu > 0 else None
+  rel_txt = f"is the subject's {mapping_inrelto[int(relto)]}" if pd.notna(relto) and isinstance(relto, (int, float)) and int(relto) in mapping_inrelto else None
   if edu_txt and rel_txt:
     parts.append(f"{pronoun.capitalize() if pronoun else 'The co-participant'} {edu_txt} and {rel_txt}.")
   elif edu_txt:
@@ -279,14 +279,14 @@ for idx, row in df.iterrows():
 
   # Living situation
   livwth = row.get('CODEM.INLIVWTH', None)
-  if isinstance(livwth, (int, float)) and int(livwth) == 1:
+  if pd.notna(livwth) and isinstance(livwth, (int, float)) and int(livwth) == 1:
     parts.append(f"{pronoun.capitalize() if pronoun else 'The co-participant'} lives with the subject.")
 
   # Contact frequency
   invisits_val = row.get('CODEM.INVISITS', None)
-  visit_freq = mapping_invisits.get(int(invisits_val), None) if not pd.isna(invisits_val) else None
+  visit_freq = mapping_invisits.get(int(invisits_val), None) if pd.notna(invisits_val) and isinstance(invisits_val, (int, float)) else None
   incalls_val = row.get('CODEM.INCALLS', None)
-  call_freq = mapping_invisits.get(int(incalls_val), None) if not pd.isna(incalls_val) else None
+  call_freq = mapping_invisits.get(int(incalls_val), None) if pd.notna(incalls_val) and isinstance(incalls_val, (int, float)) else None
   if visit_freq and call_freq:
     parts.append(f"{pronoun.capitalize() if pronoun else 'The co-participant'} visits the subject {visit_freq} and calls {call_freq}.")
   elif visit_freq:
@@ -296,7 +296,7 @@ for idx, row in df.iterrows():
 
   # Reliability
   rely = row.get('CODEM.INRELY', None)
-  if isinstance(rely, (int, float)):
+  if pd.notna(rely) and isinstance(rely, (int, float)):
     if int(rely) == 1:
       parts.append(f"{pronoun.capitalize() if pronoun else 'The co-participant'} is considered reliable.")
     elif int(rely) == 0:
@@ -313,7 +313,7 @@ for idx, row in df.iterrows():
 
   # FAM.NACCFAM - family w cognitive impairment
   naccfam_source = row['FAM.NACCFAM']
-  if isinstance(naccfam_source, (int, float)) and int(naccfam_source) == 1:
+  if pd.notna(naccfam_source) and isinstance(naccfam_source, (int, float)) and int(naccfam_source) == 1:
     paragraph_parts.append(f"The subject has at least one first-degree family member with cognitive impairment.")
   #elif isinstance(naccfam_source, (int, float)) and int(naccfam_source) == 0:
     #paragraph_parts.append(f"The subject does not have any first-degree family members with cognitive impairment.")
@@ -329,7 +329,7 @@ for idx, row in df.iterrows():
 
   # MED.NACCAMD
   naccamd_source = row['MED.NACCAMD']
-  if isinstance(naccamd_source, (int, float)) and int(naccamd_source) > 0:
+  if pd.notna(naccamd_source) and isinstance(naccamd_source, (int, float)) and int(naccamd_source) > 0:
     if int(naccamd_source) == 1:
       paragraph_parts.append(f"The subject takes one medication.")
     elif int(naccamd_source) > 1:
@@ -354,11 +354,11 @@ for idx, row in df.iterrows():
   # MED.NACCADMD - ad meds and diabetes meds
   admd_source = row['MED.NACCADMD']
   dbmd_source = row['MED.NACCDBMD']
-  if isinstance(admd_source, (int, float)) and int(admd_source) == 1 and isinstance(dbmd_source, (int, float)) and int(dbmd_source) == 1:
+  if pd.notna(admd_source) and isinstance(admd_source, (int, float)) and int(admd_source) == 1 and pd.notna(dbmd_source) and isinstance(dbmd_source, (int, float)) and int(dbmd_source) == 1:
     paragraph_parts.append(f"The subjet reported use of an FDA-approved medication for Alzheimer's disease symptoms and diabetes medication.")
-  elif isinstance(admd_source, (int, float)) and int(admd_source) == 1:
+  elif pd.notna(admd_source) and isinstance(admd_source, (int, float)) and int(admd_source) == 1:
     paragraph_parts.append(f"The subject reported use of an FDA-approved medication for Alzheimer's disease symptoms.")
-  elif isinstance(dbmd_source, (int, float)) and int(dbmd_source) == 1:
+  elif pd.notna(dbmd_source) and isinstance(dbmd_source, (int, float)) and int(dbmd_source) == 1:
     paragraph_parts.append(f"The subject reported use of diabetes medication.")
 
   paragrapha4 = " ".join(paragraph_parts)
@@ -380,22 +380,22 @@ for idx, row in df.iterrows():
   packsper = row['HLT.PACKSPER']
   quitsmok = row['HLT.QUITSMOK']
 
-  if isinstance(tobac30, (int, float)) and int(tobac30) == 1:
+  if pd.notna(tobac30) and isinstance(tobac30, (int, float)) and int(tobac30) == 1:
     smoking_bits.append("has smoked cigarettes in the last 30 days")
 
-  if isinstance(smokyrs, (int, float)) and int(smokyrs) > 0:
+  if pd.notna(smokyrs) and isinstance(smokyrs, (int, float)) and int(smokyrs) > 0:
     if int(smokyrs) == 1:
       smoking_bits.append(f"has smoked cigarettes for {int(smokyrs)} year")
     else:
       smoking_bits.append(f"has smoked cigarettes for {int(smokyrs)} years")
 
-  if isinstance(packsper, (int, float)) and int(packsper) > 0:
+  if pd.notna(packsper) and isinstance(packsper, (int, float)) and int(packsper) > 0:
     if int(packsper) == 1:
       smoking_bits.append(f"smokes {int(packsper)} pack of cigarettes per day")
     else:
       smoking_bits.append(f"smokes {int(packsper)} packs of cigarettes per day")
 
-  if isinstance(quitsmok, (int, float)) and int(quitsmok) > 0:
+  if pd.notna(quitsmok) and isinstance(quitsmok, (int, float)) and int(quitsmok) > 0:
     smoking_bits.append(f"has quit smoking at age {int(quitsmok)}")
 
   if smoking_bits:
@@ -403,7 +403,7 @@ for idx, row in df.iterrows():
 
   # alcohol use
   alcfreq = row['HLT.ALCFREQ']
-  if isinstance(alcfreq, (int, float)) and int(alcfreq) in mapping_alcfreq:
+  if pd.notna(alcfreq) and isinstance(alcfreq, (int, float)) and int(alcfreq) in mapping_alcfreq:
     paragraph_parts.append(f"The subject drinks alcohol {mapping_alcfreq[int(alcfreq)]}.")
 
   # cardiovascular conditions
@@ -411,103 +411,103 @@ for idx, row in df.iterrows():
   cvhatt = row['HLT.CVHATT']
   hattyear = row['HLT.HATTYEAR']
 
-  if isinstance(cvhatt, (int, float)) and int(cvhatt) == 1:
+  if pd.notna(cvhatt) and isinstance(cvhatt, (int, float)) and int(cvhatt) == 1:
     heart_bits.append("has a heart attack/cardiac arrest")
 
-  if isinstance(hattyear, (int, float)) and int(hattyear) not in [8888, 9999, -4]:
+  if pd.notna(hattyear) and isinstance(hattyear, (int, float)) and int(hattyear) not in [8888, 9999, -4]:
     heart_bits.append(f"had a heart attack in the year {int(hattyear)}")
 
   if heart_bits:
     paragraph_parts.append("The subject " + ", and ".join(heart_bits) + ".")
 
-  if isinstance(row['HLT.CVANGINA'], (int, float)) and int(row['HLT.CVANGINA']) == 1:
+  if pd.notna(row['HLT.CVANGINA']) and isinstance(row['HLT.CVANGINA'], (int, float)) and int(row['HLT.CVANGINA']) == 1:
     paragraph_parts.append("The subject has had angina.")
 
-  if isinstance(row['HLT.CVOTHR'], (int, float)) and int(row['HLT.CVOTHR']) == 1:
+  if pd.notna(row['HLT.CVOTHR']) and isinstance(row['HLT.CVOTHR'], (int, float)) and int(row['HLT.CVOTHR']) == 1:
     paragraph_parts.append("The subject has had other cardiovascular diseases.")
 
   # stroke history
   stroke_bits = []
 
-  if isinstance(row['HLT.CVSTROKE'], (int, float)) and int(row['HLT.CVSTROKE']) == 1:
+  if pd.notna(row['HLT.CVSTROKE']) and isinstance(row['HLT.CVSTROKE'], (int, float)) and int(row['HLT.CVSTROKE']) == 1:
     stroke_bits.append("has had a stroke")
 
-  if isinstance(row['HLT.NACCSTYR'], (int, float)) and int(row['HLT.NACCSTYR']) not in [8888, 9999, -4]:
+  if pd.notna(row['HLT.NACCSTYR']) and isinstance(row['HLT.NACCSTYR'], (int, float)) and int(row['HLT.NACCSTYR']) not in [8888, 9999, -4]:
     stroke_bits.append(f"had their most recent stroke in the year {int(row['HLT.NACCSTYR'])}")
 
   if stroke_bits:
     paragraph_parts.append("The subject " + ", and ".join(stroke_bits) + ".")
 
   # tia
-  if isinstance(row['HLT.CBTIA'], (int, float)) and int(row['HLT.CBTIA']) == 1:
+  if pd.notna(row['HLT.CBTIA']) and isinstance(row['HLT.CBTIA'], (int, float)) and int(row['HLT.CBTIA']) == 1:
     paragraph_parts.append("The subject has had a transient ischemic attack.")
 
   # parkinsons
   pd_bits = []
 
-  if isinstance(row['HLT.PD'], (int, float)) and int(row['HLT.PD']) == 1:
+  if pd.notna(row['HLT.PD']) and isinstance(row['HLT.PD'], (int, float)) and int(row['HLT.PD']) == 1:
     pd_bits.append("has been diagnosed with Parkinson's disease")
 
-  if isinstance(row['HLT.PDYR'], (int, float)) and int(row['HLT.PDYR']) != -4:
+  if pd.notna(row['HLT.PDYR']) and isinstance(row['HLT.PDYR'], (int, float)) and int(row['HLT.PDYR']) != -4:
     pd_bits.append(f"was diagnosed with Parkinson's disease in {int(row['HLT.PDYR'])}")
 
   if pd_bits:
     paragraph_parts.append("The subject " + ", and ".join(pd_bits) + ".")
 
   # seizures
-  if isinstance(row['HLT.SEIZURES'], (int, float)) and int(row['HLT.SEIZURES']) == 1:
+  if pd.notna(row['HLT.SEIZURES']) and isinstance(row['HLT.SEIZURES'], (int, float)) and int(row['HLT.SEIZURES']) == 1:
     paragraph_parts.append("The subject has had seizures.")
 
   # tbi
   tbi_bits = []
 
-  if isinstance(row['HLT.TBI'], (int, float)) and int(row['HLT.TBI']) == 1:
+  if pd.notna(row['HLT.TBI']) and isinstance(row['HLT.TBI'], (int, float)) and int(row['HLT.TBI']) == 1:
     tbi_bits.append("has had a traumatic brain injury")
 
-  if isinstance(row['HLT.TBIBRIEF'], (int, float)) and int(row['HLT.TBIBRIEF']) not in [-4, 9]:
+  if pd.notna(row['HLT.TBIBRIEF']) and isinstance(row['HLT.TBIBRIEF'], (int, float)) and int(row['HLT.TBIBRIEF']) not in [-4, 9]:
     if int(row['HLT.TBIBRIEF']) == 1:
       tbi_bits.append("has had a single traumatic injury with a brief loss of consciousness")
     elif int(row['HLT.TBIBRIEF']) == 2:
       tbi_bits.append("has had multiple traumatic brain injuries with a brief loss of consciousness")
 
-  if isinstance(row['HLT.TBIEXTEN'], (int, float)) and int(row['HLT.TBIEXTEN']) not in [-4, 9]:
+  if pd.notna(row['HLT.TBIEXTEN']) and isinstance(row['HLT.TBIEXTEN'], (int, float)) and int(row['HLT.TBIEXTEN']) not in [-4, 9]:
     if int(row['HLT.TBIEXTEN']) == 1:
       tbi_bits.append("has had a single traumatic injury with an extended loss of consciousness")
     elif int(row['HLT.TBIEXTEN']) == 2:
       tbi_bits.append("has had multiple traumatic brain injuries with an extended loss of consciousness")
 
-  if isinstance(row['HLT.TBIYEAR'], (int, float)) and int(row['HLT.TBIYEAR']) not in [8888, 9999]:
+  if pd.notna(row['HLT.TBIYEAR']) and isinstance(row['HLT.TBIYEAR'], (int, float)) and int(row['HLT.TBIYEAR']) not in [8888, 9999]:
     tbi_bits.append(f"most recently in {int(row['HLT.TBIYEAR'])}")
 
   if tbi_bits:
     paragraph_parts.append("The subject " + ", and ".join(tbi_bits) + ".")
 
   # Other diagnoses
-  if isinstance(row['HLT.DIABETES'], (int, float)) and int(row['HLT.DIABETES']) == 1:
+  if pd.notna(row['HLT.DIABETES']) and isinstance(row['HLT.DIABETES'], (int, float)) and int(row['HLT.DIABETES']) == 1:
     paragraph_parts.append("The subject has been diagnosed with diabetes.")
 
-  if isinstance(row['HLT.HYPERTENSION'], (int, float)) and int(row['HLT.HYPERTENSION']) == 1:
+  if pd.notna(row['HLT.HYPERTENSION']) and isinstance(row['HLT.HYPERTENSION'], (int, float)) and int(row['HLT.HYPERTENSION']) == 1:
     paragraph_parts.append("The subject has been diagnosed with hypertension.")
 
-  if isinstance(row['HLT.B12DEF'], (int, float)) and int(row['HLT.B12DEF']) == 1:
+  if pd.notna(row['HLT.B12DEF']) and isinstance(row['HLT.B12DEF'], (int, float)) and int(row['HLT.B12DEF']) == 1:
     paragraph_parts.append("The subject has been diagnosed with deficiency of vitamin B12.")
 
-  if isinstance(row['HLT.THYROID'], (int, float)) and int(row['HLT.THYROID']) == 1:
+  if pd.notna(row['HLT.THYROID']) and isinstance(row['HLT.THYROID'], (int, float)) and int(row['HLT.THYROID']) == 1:
     paragraph_parts.append("The subject has been diagnosed with thyroid disease.")
 
-  if isinstance(row['HLT.ARTHRIT'], (int, float)) and int(row['HLT.ARTHRIT']) == 1:
+  if pd.notna(row['HLT.ARTHRIT']) and isinstance(row['HLT.ARTHRIT'], (int, float)) and int(row['HLT.ARTHRIT']) == 1:
     paragraph_parts.append("The subject has been diagnosed with arthritis.")
 
-  if isinstance(row['HLT.INCONTU'], (int, float)) and int(row['HLT.INCONTU']) == 1:
+  if pd.notna(row['HLT.INCONTU']) and isinstance(row['HLT.INCONTU'], (int, float)) and int(row['HLT.INCONTU']) == 1:
     paragraph_parts.append("The subject has been diagnosed with urinary incontinence.")
 
-  if isinstance(row['HLT.ALCOHOL'], (int, float)) and int(row['HLT.ALCOHOL']) == 1:
+  if pd.notna(row['HLT.ALCOHOL']) and isinstance(row['HLT.ALCOHOL'], (int, float)) and int(row['HLT.ALCOHOL']) == 1:
     paragraph_parts.append("The subject has had clinically significant impairment due to alcohol abuse.")
 
-  if isinstance(row['HLT.ANXIETY'], (int, float)) and int(row['HLT.ANXIETY']) == 1:
+  if pd.notna(row['HLT.ANXIETY']) and isinstance(row['HLT.ANXIETY'], (int, float)) and int(row['HLT.ANXIETY']) == 1:
     paragraph_parts.append("The subject has been diagnosed with anxiety.")
 
-  if isinstance(row['HLT.NACCTBI'], (int, float)) and int(row['HLT.NACCTBI']) == 1:
+  if pd.notna(row['HLT.NACCTBI']) and isinstance(row['HLT.NACCTBI'], (int, float)) and int(row['HLT.NACCTBI']) == 1:
     paragraph_parts.append("The subject has had a history of traumatic brain injury")
 
   paragrapha5 = " ".join(paragraph_parts)
@@ -523,9 +523,9 @@ for idx, row in df.iterrows():
   height = row['CLIN.HEIGHT']
   weight = row['CLIN.WEIGHT']
   bmi = row['CLIN.NACCBMI']
-  height_valid = isinstance(height, (int, float)) and 0 <= int(height) <= 80
-  weight_valid = isinstance(weight, (int, float)) and 0 <= weight < 888
-  bmi_valid = isinstance(bmi, (int, float)) and 10 <= bmi <= 100
+  height_valid = pd.notna(height) and isinstance(height, (int, float)) and 0 <= int(height) <= 80
+  weight_valid = pd.notna(weight) and isinstance(weight, (int, float)) and 0 <= weight < 888
+  bmi_valid = pd.notna(bmi) and isinstance(bmi, (int, float)) and 10 <= bmi <= 100
 
   if height_valid or weight_valid or bmi_valid:
     sentence = "The subject"
@@ -537,35 +537,39 @@ for idx, row in df.iterrows():
       else:
         sentence += f" weighs {weight} pounds"
     if bmi_valid:
-      sentence += f", with a BMI of {bmi}"
+      if height_valid or weight_valid:
+        sentence += f", with a BMI of {bmi}"
+      else:
+        sentence += f" with a BMI of {bmi}"
     sentence += "."
     paragraph_parts.append(sentence)
+
 
   # Blood pressure (sitting, left, right)
   bpsys = row['CLIN.BPSYS']
   bpdias = row['CLIN.BPDIAS']
   bpsysl = row['CLIN.BPSYSL']
-  bpsysr = row['CLIN.BPSYSR']
   bpdiasl = row['CLIN.BPDIASL']
+  bpsysr = row['CLIN.BPSYSR']
   bpdiasr = row['CLIN.BPDIASR']
 
   bp_sentences = []
-  if isinstance(bpsys, (int, float)) and 70 <= bpsys <= 230 and isinstance(bpdias, (int, float)) and 30 <= bpdias <= 140:
-    bp_sentences.append(f"sitting blood pressure of {bpsys}/{bpdias} mmHg")
+  if pd.notna(bpsys) and isinstance(bpsys, (int, float)) and 70 <= bpsys <= 230 and pd.notna(bpdias) and isinstance(bpdias, (int, float)) and 30 <= bpdias <= 140:
+    bp_sentences.append(f"sitting blood pressure of {int(bpsys)}/{int(bpdias)} mmHg")
 
-  if isinstance(bpsysl, (int, float)) and 70 <= bpsysl <= 230 and isinstance(bpdiasl, (int, float)) and 30 <= bpdiasl <= 140:
-    bp_sentences.append(f"left arm blood pressure of {bpsysl}/{bpdiasl} mmHg")
+  if pd.notna(bpsysl) and isinstance(bpsysl, (int, float)) and 70 <= bpsysl <= 230 and pd.notna(bpdiasl) and isinstance(bpdiasl, (int, float)) and 30 <= bpdiasl <= 140:
+    bp_sentences.append(f"left arm blood pressure of {int(bpsysl)}/{int(bpdiasl)} mmHg")
 
-  if isinstance(bpsysr, (int, float)) and 70 <= bpsysr <= 230 and isinstance(bpdiasr, (int, float)) and 30 <= bpdiasr <= 140:
-    bp_sentences.append(f"right arm blood pressure of {bpsysr}/{bpdiasr} mmHg")
+  if pd.notna(bpsysr) and isinstance(bpsysr, (int, float)) and 70 <= bpsysr <= 230 and pd.notna(bpdiasr) and isinstance(bpdiasr, (int, float)) and 30 <= bpdiasr <= 140:
+    bp_sentences.append(f"right arm blood pressure of {int(bpsysr)}/{int(bpdiasr)} mmHg")
 
   if bp_sentences:
     paragraph_parts.append("The subject has " + ", and ".join(bp_sentences) + ".")
 
   # Heart rate
   hrate = row['CLIN.HRATE']
-  if isinstance(hrate, (int, float)) and 0 <= hrate <= 121 and hrate != 9:
-    paragraph_parts.append(f"The subject's heart rate is {hrate} bpm.")
+  if pd.notna(hrate) and isinstance(hrate, (int, float)) and 0 <= int(hrate) <= 121 and int(hrate) != 9:
+    paragraph_parts.append(f"The subject's heart rate is {int(hrate)} bpm.")
 
   # Vision
   vision = row['CLIN.VISION']
@@ -573,11 +577,11 @@ for idx, row in df.iterrows():
   viswcorr = row['CLIN.VISWCORR']
   vision_parts = []
 
-  if isinstance(vision, (int, float)) and int(vision) == 0:
+  if pd.notna(vision) and isinstance(vision, (int, float)) and int(vision) == 0:
     vision_parts.append("vision is not functionally normal without corrective lenses")
-  if isinstance(viscorr, (int, float)) and int(viscorr) == 1:
+  if pd.notna(viscorr) and isinstance(viscorr, (int, float)) and int(viscorr) == 1:
     vision_parts.append("usually wears corrective lenses")
-  if isinstance(viswcorr, (int, float)) and int(viswcorr) == 1:
+  if pd.notna(viswcorr) and isinstance(viswcorr, (int, float)) and int(viswcorr) == 1:
     vision_parts.append("vision is functionally normal with corrective lenses")
 
   if vision_parts:
@@ -589,11 +593,11 @@ for idx, row in df.iterrows():
   hearwaid = row['CLIN.HEARWAID']
   hearing_parts = []
 
-  if isinstance(hearing, (int, float)) and int(hearing) == 0:
+  if pd.notna(hearing) and isinstance(hearing, (int, float)) and int(hearing) == 0:
     hearing_parts.append("hearing is not normal without a hearing aid")
-  if isinstance(hearaid, (int, float)) and int(hearaid) == 1:
+  if pd.notna(hearaid) and isinstance(hearaid, (int, float)) and int(hearaid) == 1:
     hearing_parts.append("usually wears a hearing aid")
-  if isinstance(hearwaid, (int, float)) and int(hearwaid) == 1:
+  if pd.notna(hearwaid) and isinstance(hearwaid, (int, float)) and int(hearwaid) == 1:
     hearing_parts.append("hearing is functionally normal with a hearing aid")
 
   if hearing_parts:
@@ -611,10 +615,10 @@ for idx, row in df.iterrows():
   # Onset description
   onset_phrases = []
   abrupt_source = row['CLIN.ABRUPT']
-  if isinstance(abrupt_source, (int, float)) and int(abrupt_source) == 2:
+  if pd.notna(abrupt_source) and isinstance(abrupt_source, (int, float)) and int(abrupt_source) == 2:
     onset_phrases.append("abrupt in onset")
   stepwise_source = row['CLIN.STEPWISE']
-  if isinstance(stepwise_source, (int, float)) and int(stepwise_source) == 1:
+  if pd.notna(stepwise_source) and isinstance(stepwise_source, (int, float)) and int(stepwise_source) == 1:
     onset_phrases.append("characterized by stepwise deterioration")
   if onset_phrases:
     paragraph_parts.append(f"The subject's cognitive status was {', and '.join(onset_phrases)}.")
@@ -622,10 +626,10 @@ for idx, row in df.iterrows():
   # Somatic and emotional symptoms
   somatic_emotional = []
   somatic_source = row['CLIN.SOMATIC']
-  if isinstance(somatic_source, (int, float)) and int(somatic_source) == 1:
+  if pd.notna(somatic_source) and isinstance(somatic_source, (int, float)) and int(somatic_source) == 1:
     somatic_emotional.append("somatic complaints")
   emot_source = row['CLIN.EMOT']
-  if isinstance(emot_source, (int, float)) and int(emot_source) == 1:
+  if pd.notna(emot_source) and isinstance(emot_source, (int, float)) and int(emot_source) == 1:
     somatic_emotional.append("emotional incontinence")
   if somatic_emotional:
     paragraph_parts.append(f"The subject has {', and '.join(somatic_emotional)}.")
@@ -633,10 +637,10 @@ for idx, row in df.iterrows():
   # Stroke and hypertension history
   hx_conditions = []
   hxhyper_source = row['CLIN.HXHYPER']
-  if isinstance(hxhyper_source, (int, float)) and int(hxhyper_source) == 1:
+  if pd.notna(hxhyper_source) and isinstance(hxhyper_source, (int, float)) and int(hxhyper_source) == 1:
     hx_conditions.append("a history or presence of hypertension")
   hxstroke_source = row['CLIN.HXSTROKE']
-  if isinstance(hxstroke_source, (int, float)) and int(hxstroke_source) == 2:
+  if pd.notna(hxstroke_source) and isinstance(hxstroke_source, (int, float)) and int(hxstroke_source) == 2:
     hx_conditions.append("a history of stroke")
   if hx_conditions:
     paragraph_parts.append(f"The subject has {', and '.join(hx_conditions)}.")
@@ -644,22 +648,22 @@ for idx, row in df.iterrows():
   # Neurological symptoms and signs
   neuro_findings = []
   foclsym_source = row['CLIN.FOCLSYM']
-  if isinstance(foclsym_source, (int, float)) and int(foclsym_source) == 2:
+  if pd.notna(foclsym_source) and isinstance(foclsym_source, (int, float)) and int(foclsym_source) == 2:
     neuro_findings.append("focal neurological symptoms")
   foclsign_source = row['CLIN.FOCLSIGN']
-  if isinstance(foclsign_source, (int, float)) and int(foclsign_source) == 2:
+  if pd.notna(foclsign_source) and isinstance(foclsign_source, (int, float)) and int(foclsign_source) == 2:
     neuro_findings.append("focal neurological signs")
   if neuro_findings:
     paragraph_parts.append(f"The subject has {', and '.join(neuro_findings)}.")
 
   # Hachinski score
   hachin_source = row['CLIN.HACHIN']
-  if isinstance(hachin_source, (int, float)) and 0 <= int(hachin_source) <= 7:
+  if pd.notna(hachin_source) and isinstance(hachin_source, (int, float)) and 0 <= int(hachin_source) <= 7:
     paragraph_parts.append(f"The subject's Hachinski Ischemic Score is {int(hachin_source)}.")
 
   # Cerebrovascular contribution
   cvdcog_source = row['CLIN.CVDCOG']
-  if isinstance(cvdcog_source, (int, float)) and int(cvdcog_source) == 1:
+  if pd.notna(cvdcog_source) and isinstance(cvdcog_source, (int, float)) and int(cvdcog_source) == 1:
     paragraph_parts.append("Cerebrovascular disease is contributing to cognitive impairment.")
 
   paragraphb2 = " ".join(paragraph_parts)
@@ -678,11 +682,11 @@ for idx, row in df.iterrows():
   # Rising from a chair
   arising_text = ""
   arising_source = row['CLIN.ARISING']
-  if isinstance(arising_source, (int, float)) and int(arising_source) in mapping_arising:
+  if pd.notna(arising_source) and isinstance(arising_source, (int, float)) and int(arising_source) in mapping_arising:
     arising_text = f"is {mapping_arising[int(arising_source)]} when rising from a chair"
 
   arisingx_source = row['CLIN.ARISINGX']
-  if isinstance(arisingx_source, str) and str(arisingx_source) not in ['-8888', '-9999']:
+  if pd.notna(arisingx_source) and isinstance(arisingx_source, str) and str(arisingx_source).strip() not in ['-8888', '-9999']:
     custom_map = {'Tried but unable': "tried, but was unable to get up from a chair", 'Participant could not stand unassisted': "could not stand unassisted", 'Not attempted, you felt unsafe': "did not attempt to rise from the chair because the examiner felt unsafe", 'Not attemmpted, participant felt unsafe': "did not attempt to rise from the chair because they felt unsafe", 'Participant unable to understand instructions': "did not attempt to rise from the chair because they did not understand the instructions"}
     if arisingx_source in custom_map:
       arising_text = custom_map[arisingx_source]
@@ -690,11 +694,11 @@ for idx, row in df.iterrows():
   # Gait
   gait_text = ""
   gait_source = row['CLIN.GAIT']
-  if isinstance(gait_source, (int, float)) and int(gait_source) in mapping_gait:
+  if pd.notna(gait_source) and isinstance(gait_source, (int, float)) and int(gait_source) in mapping_gait:
     gait_text = mapping_gait[int(gait_source)]
 
   gaitx_source = row['CLIN.GAITX']
-  if isinstance(gaitx_source, str) and str(gaitx_source) not in ['-8888', '-9999']:
+  if pd.notna(gaitx_source) and isinstance(gaitx_source, str) and str(gaitx_source).strip() not in ['-8888', '-9999']:
     custom_map_gait = {'Tried but unable': "tried, but was unable to walk", 'Participant could not walk unassisted': "could not walk unassisted", 'Not attempted, you felt unsafe': "did not attempt to walk because the examiner felt unsafe", 'Not attemmpted, participant felt unsafe': "did not attempt to walk because they felt unsafe", 'Participant unable to understand instructions': "did not attempt to walk because they did not understand the instructions"}
     if gaitx_source in custom_map_gait:
       gait_text = custom_map_gait[gaitx_source]
@@ -718,14 +722,14 @@ for idx, row in df.iterrows():
 
   # life satisfaction and activities
   life_satis = None
-  if isinstance(row['CLIN.SATIS'], (int, float)) and int(row['CLIN.SATIS']) in [0, 1]:
+  if pd.notna(row['CLIN.SATIS']) and isinstance(row['CLIN.SATIS'], (int, float)) and int(row['CLIN.SATIS']) in [0, 1]:
     if int(row['CLIN.SATIS']) == 0:
       life_satis = "is basically satisfied"
     elif int(row['CLIN.SATIS']) == 1:
       life_satis = "is not satisfied"
 
   activities = None
-  if isinstance(row['CLIN.DROPACT'], (int, float)) and int(row['CLIN.DROPACT']) in [0, 1]:
+  if pd.notna(row['CLIN.DROPACT']) and isinstance(row['CLIN.DROPACT'], (int, float)) and int(row['CLIN.DROPACT']) in [0, 1]:
     if int(row['CLIN.DROPACT']) == 0:
       activities = "has not dropped many activities and interests"
     elif int(row['CLIN.DROPACT']) == 1:
@@ -738,14 +742,14 @@ for idx, row in df.iterrows():
 
   # emotional emptiness and boredom
   emptiness = None
-  if isinstance(row['CLIN.EMPTY'], (int, float)) and int(row['CLIN.EMPTY']) in [0, 1]:
+  if pd.notna(row['CLIN.EMPTY']) and isinstance(row['CLIN.EMPTY'], (int, float)) and int(row['CLIN.EMPTY']) in [0, 1]:
     if int(row['CLIN.EMPTY']) == 0:
       emptiness = "does not feel that their life is empty"
     elif int(row['CLIN.EMPTY']) == 1:
       emptiness = "feels that their life is empty"
 
   boredom = None
-  if isinstance(row['CLIN.BORED'], (int, float)) and int(row['CLIN.BORED']) in [0, 1]:
+  if pd.notna(row['CLIN.BORED']) and isinstance(row['CLIN.BORED'], (int, float)) and int(row['CLIN.BORED']) in [0, 1]:
     if int(row['CLIN.BORED']) == 0:
       boredom = "does not get bored often"
     elif int(row['CLIN.BORED']) == 1:
@@ -757,14 +761,14 @@ for idx, row in df.iterrows():
 
   # Spirits and fear
   spirits = None
-  if isinstance(row['CLIN.SPIRITS'], (int, float)) and int(row['CLIN.SPIRITS']) in [0, 1]:
+  if pd.notna(row['CLIN.SPIRITS']) and isinstance(row['CLIN.SPIRITS'], (int, float)) and int(row['CLIN.SPIRITS']) in [0, 1]:
     if int(row['CLIN.SPIRITS']) == 0:
       spirits = "is in good spirits most of the time"
     elif int(row['CLIN.SPIRITS']) == 1:
       spirits = "is not in good spirits most of the time"
 
   fear = None
-  if isinstance(row['CLIN.AFRAID'], (int, float)) and int(row['CLIN.AFRAID']) in [0, 1]:
+  if pd.notna(row['CLIN.AFRAID']) and isinstance(row['CLIN.AFRAID'], (int, float)) and int(row['CLIN.AFRAID']) in [0, 1]:
     if int(row['CLIN.AFRAID']) == 0:
       fear = "is not afraid of something bad happening to them"
     elif int(row['CLIN.AFRAID']) == 1:
@@ -776,14 +780,14 @@ for idx, row in df.iterrows():
 
   # happiness and helplessness
   happiness = None
-  if isinstance(row['CLIN.HAPPY'], (int, float)) and int(row['CLIN.HAPPY']) in [0, 1]:
+  if pd.notna(row['CLIN.HAPPY']) and isinstance(row['CLIN.HAPPY'], (int, float)) and int(row['CLIN.HAPPY']) in [0, 1]:
     if int(row['CLIN.HAPPY']) == 0:
       happiness = "feels happy most of the time"
     elif int(row['CLIN.HAPPY']) == 1:
       happiness = "does not feel happy most of the time"
 
   helplessness = None
-  if isinstance(row['CLIN.HELPLESS'], (int, float)) and int(row['CLIN.HELPLESS']) in [0, 1]:
+  if pd.notna(row['CLIN.HELPLESS']) and isinstance(row['CLIN.HELPLESS'], (int, float)) and int(row['CLIN.HELPLESS']) in [0, 1]:
     if int(row['CLIN.HELPLESS']) == 0:
       helplessness = "does not feel helpless often"
     elif int(row['CLIN.HELPLESS']) == 1:
@@ -795,14 +799,14 @@ for idx, row in df.iterrows():
 
   # social activity and memory
   social = None
-  if isinstance(row['CLIN.STAYHOME'], (int, float)) and int(row['CLIN.STAYHOME']) in [0, 1]:
+  if pd.notna(row['CLIN.STAYHOME']) and isinstance(row['CLIN.STAYHOME'], (int, float)) and int(row['CLIN.STAYHOME']) in [0, 1]:
     if int(row['CLIN.STAYHOME']) == 0:
       social = "prefers to go out and do new things"
     elif int(row['CLIN.STAYHOME']) == 1:
       social = "prefers to stay at home"
 
   memory = None
-  if isinstance(row['CLIN.MEMPROB'], (int, float)) and int(row['CLIN.MEMPROB']) in [0, 1]:
+  if pd.notna(row['CLIN.MEMPROB']) and isinstance(row['CLIN.MEMPROB'], (int, float)) and int(row['CLIN.MEMPROB']) in [0, 1]:
     if int(row['CLIN.MEMPROB']) == 0:
       memory = "does not feel they have more problems with memory than most"
     elif int(row['CLIN.MEMPROB']) == 1:
@@ -814,14 +818,14 @@ for idx, row in df.iterrows():
 
   # attitude towards life and self worth
   alive = None
-  if isinstance(row['CLIN.WONDRFUL'], (int, float)) and int(row['CLIN.WONDRFUL']) in [0, 1]:
+  if pd.notna(row['CLIN.WONDRFUL']) and isinstance(row['CLIN.WONDRFUL'], (int, float)) and int(row['CLIN.WONDRFUL']) in [0, 1]:
     if int(row['CLIN.WONDRFUL']) == 0:
       alive = "thinks it is wonderful to be alive now"
     elif int(row['CLIN.WONDRFUL']) == 1:
       alive = "does not think it is not wonderful to be alive now"
 
   worth = None
-  if isinstance(row['CLIN.WRTHLESS'], (int, float)) and int(row['CLIN.WRTHLESS']) in [0, 1]:
+  if pd.notna(row['CLIN.WRTHLESS']) and isinstance(row['CLIN.WRTHLESS'], (int, float)) and int(row['CLIN.WRTHLESS']) in [0, 1]:
     if int(row['CLIN.WRTHLESS']) == 0:
       worth = "does not feel worthless"
     elif int(row['CLIN.WRTHLESS']) == 1:
@@ -833,14 +837,14 @@ for idx, row in df.iterrows():
 
   # energy and hopelessness
   energy = None
-  if isinstance(row['CLIN.ENERGY'], (int, float)) and int(row['CLIN.ENERGY']) in [0, 1]:
+  if pd.notna(row['CLIN.ENERGY']) and isinstance(row['CLIN.ENERGY'], (int, float)) and int(row['CLIN.ENERGY']) in [0, 1]:
     if int(row['CLIN.ENERGY']) == 0:
       energy = "feels full of energy"
     elif int(row['CLIN.ENERGY']) == 1:
       energy = "does not feel full of energy"
 
   hopeless = None
-  if isinstance(row['CLIN.HOPELESS'], (int, float)) and int(row['CLIN.HOPELESS']) in [0, 1]:
+  if pd.notna(row['CLIN.HOPELESS']) and isinstance(row['CLIN.HOPELESS'], (int, float)) and int(row['CLIN.HOPELESS']) in [0, 1]:
     if int(row['CLIN.HOPELESS']) == 0:
       hopeless = "feels their situation is hopeless"
     elif int(row['CLIN.HOPELESS']) == 1:
@@ -851,14 +855,14 @@ for idx, row in df.iterrows():
     paragraph_parts.append(combined)
 
   # perspective
-  if isinstance(row['CLIN.BETTER'], (int, float)) and int(row['CLIN.BETTER']) in [0, 1]:
+  if pd.notna(row['CLIN.BETTER']) and isinstance(row['CLIN.BETTER'], (int, float)) and int(row['CLIN.BETTER']) in [0, 1]:
     if int(row['CLIN.BETTER']) == 0:
       paragraph_parts.append(f"The subject does not think that most people are better off than they are.")
     elif int(row['CLIN.BETTER']) == 1:
       paragraph_parts.append(f"The subject thinks that most people are better off than they are.")
 
   # gds score
-  if isinstance(row['CLIN.NACCGDS'], (int, float)) and 0 <= int(row['CLIN.NACCGDS']) < 88:
+  if pd.notna(row['CLIN.NACCGDS']) and isinstance(row['CLIN.NACCGDS'], (int, float)) and 0 <= int(row['CLIN.NACCGDS']) < 88:
     paragraph_parts.append(f"The subject's GDS score is {int(row['CLIN.NACCGDS'])}.")
 
   paragraphb6 = " ".join(paragraph_parts)
@@ -872,7 +876,7 @@ for idx, row in df.iterrows():
 
   # CLIN.SIVDFIND
   sivdfind_source = row['CLIN.SIVDFIND']
-  if isinstance(sivdfind_source, (int, float)) and int(sivdfind_source) == 1:
+  if pd.notna(sivdfind_source) and isinstance(sivdfind_source, (int, float)) and int(sivdfind_source) == 1:
     paragraph_parts.append(f"The subject had focal or other neurological findings consistent with Subcortical Ischemic Vascular Dementia.")
 
   paragraphb8 = " ".join(paragraph_parts)
@@ -886,19 +890,19 @@ for idx, row in df.iterrows():
 
   # decline in memory
   decline_statements = []
-  if isinstance(row['CLIN.DECSUB'], (int, float)) and int(row['CLIN.DECSUB']) == 1:
+  if pd.notna(row['CLIN.DECSUB']) and isinstance(row['CLIN.DECSUB'], (int, float)) and int(row['CLIN.DECSUB']) == 1:
     decline_statements.append("the subject reports a decline in memory")
-  if isinstance(row['CLIN.DECIN'], (int, float)) and int(row['CLIN.DECIN']) == 1:
+  if pd.notna(row['CLIN.DECIN']) and isinstance(row['CLIN.DECIN'], (int, float)) and int(row['CLIN.DECIN']) == 1:
     decline_statements.append("the co-participant reports a decline in the subject's memory")
   if decline_statements:
     paragraph_parts.append(" and ".join(decline_statements).capitalize() + ".")
 
   # clinicians judgment
-  if isinstance(row['CLIN.DECCLCOG'], (int, float)) and int(row['CLIN.DECCLCOG']) == 1:
+  if pd.notna(row['CLIN.DECCLCOG']) and isinstance(row['CLIN.DECCLCOG'], (int, float)) and int(row['CLIN.DECCLCOG']) == 1:
     paragraph_parts.append("Based on the clinician's judgment, the subject is currently experiencing meaningful impairment in cognition.")
 
   # current cognitive status relative to past abilities
-  if isinstance(row['CLIN.COGMEM'], (int, float)) and int(row['CLIN.COGMEM']) in [0, 1]:
+  if pd.notna(row['CLIN.COGMEM']) and isinstance(row['CLIN.COGMEM'], (int, float)) and int(row['CLIN.COGMEM']) in [0, 1]:
     if int(row['CLIN.COGMEM']) == 0:
       paragraph_parts.append("The subject is currently not meaningfully impaired, relative to previously attained abilities.")
     elif int(row['CLIN.COGMEM']) == 1:
@@ -906,9 +910,9 @@ for idx, row in df.iterrows():
 
   # fluctuations in cognition and behavior changes
   fluctuation_behavior = []
-  if isinstance(row['CLIN.COGFLUC'], (int, float)) and int(row['CLIN.COGFLUC']) == 1:
+  if pd.notna(row['CLIN.COGFLUC']) and isinstance(row['CLIN.COGFLUC'], (int, float)) and int(row['CLIN.COGFLUC']) == 1:
     fluctuation_behavior.append("is experiencing fluctuations in cognition")
-  if isinstance(row['CLIN.BEAPATHY'], (int, float)) and int(row['CLIN.BEAPATHY']) == 1:
+  if pd.notna(row['CLIN.BEAPATHY']) and isinstance(row['CLIN.BEAPATHY'], (int, float)) and int(row['CLIN.BEAPATHY']) == 1:
     fluctuation_behavior.append("manifests meaningful changes in behavior")
   if fluctuation_behavior:
     paragraph_parts.append(" and ".join(fluctuation_behavior).capitalize() + ".")
@@ -923,7 +927,7 @@ for idx, row in df.iterrows():
   paragraph_parts = []
 
   # core diagnosis
-  if isinstance(row['CLIN.NACCUDSD'], (int, float)) and int(row['CLIN.NACCUDSD']) in [2, 3, 4]:
+  if pd.notna(row['CLIN.NACCUDSD']) and isinstance(row['CLIN.NACCUDSD'], (int, float)) and int(row['CLIN.NACCUDSD']) in [2, 3, 4]:
     if int(row['CLIN.NACCUDSD']) == 2:
       paragraph_parts.append(f"The subject is impaired, but does not have mild cognitive impairment.")
     elif int(row['CLIN.NACCUDSD']) == 3:
@@ -933,21 +937,21 @@ for idx, row in df.iterrows():
 
   # dementia subtypes
   dementia_subtypes = []
-  if isinstance(row['CLIN.NACCBVFT'], (int, float)) and int(row['CLIN.NACCBVFT']) == 1:
+  if pd.notna(row['CLIN.NACCBVFT']) and isinstance(row['CLIN.NACCBVFT'], (int, float)) and int(row['CLIN.NACCBVFT']) == 1:
     dementia_subtypes.append("behavioral variant frontotemporal dementia (FTD) syndrome")
-  if isinstance(row['CLIN.NACCLBDS'], (int, float)) and int(row['CLIN.NACCLBDS']) == 1:
+  if pd.notna(row['CLIN.NACCLBDS']) and isinstance(row['CLIN.NACCLBDS'], (int, float)) and int(row['CLIN.NACCLBDS']) == 1:
     dementia_subtypes.append("Lewy body dementia syndrome")
-  if isinstance(row['CLIN.NAMDEM'], (int, float)) and int(row['CLIN.NAMDEM']) == 1:
+  if pd.notna(row['CLIN.NAMDEM']) and isinstance(row['CLIN.NAMDEM'], (int, float)) and int(row['CLIN.NAMDEM']) == 1:
     dementia_subtypes.append("non-amnestic, multidomain dementia, not PCA, bvFTD, or DLB syndrome")
   if dementia_subtypes:
     paragraph_parts.append("The subject has " + ", ".join(dementia_subtypes[:-1]) + (", and " if len(dementia_subtypes) > 1 else "") + dementia_subtypes[-1])
 
   # vascular brain injury
-  if isinstance(row['CLIN.CVD'], (int, float)) and int(row['CLIN.CVD']) == 1:
+  if pd.notna(row['CLIN.CVD']) and isinstance(row['CLIN.CVD'], (int, float)) and int(row['CLIN.CVD']) == 1:
     paragraph_parts.append(f"The subject has a presumptive etiologic diagnosis of vascular brain injury (VBI).")
 
   # alcohol abuse
-  if isinstance(row['CLIN.ALCABUSE'], (int, float)) and int(row['CLIN.ALCABUSE']) == 1:
+  if pd.notna(row['CLIN.ALCABUSE']) and isinstance(row['CLIN.ALCABUSE'], (int, float)) and int(row['CLIN.ALCABUSE']) == 1:
     paragraph_parts.append(f"The subject currently abuses alcohol.")
 
   paragraphd1 = " ".join(paragraph_parts)
@@ -961,7 +965,7 @@ for idx, row in df.iterrows():
 
   # cancer
   cancer_text = None
-  if isinstance(row['CLIN.CANCER'], (int, float)) and int(row['CLIN.CANCER']) in [1, 2]:
+  if pd.notna(row['CLIN.CANCER']) and isinstance(row['CLIN.CANCER'], (int, float)) and int(row['CLIN.CANCER']) in [1, 2]:
     if int(row['CLIN.CANCER']) == 1:
       cancer_text = "primary/non-metastatic cancer present in the last 12 months"
     elif int(row['CLIN.CANCER']) == 2:
@@ -969,7 +973,7 @@ for idx, row in df.iterrows():
 
   # diabetes
   diabetes_text = None
-  if isinstance(row['CLIN.DIABET'], (int, float)) and int(row['CLIN.DIABET']) in [1, 2, 3]:
+  if pd.notna(row['CLIN.DIABET']) and isinstance(row['CLIN.DIABET'], (int, float)) and int(row['CLIN.DIABET']) in [1, 2, 3]:
     if int(row['CLIN.DIABET']) == 1:
       diabetes_text = "type 1 diabetes"
     elif int(row['CLIN.DIABET']) == 2:
@@ -986,9 +990,9 @@ for idx, row in df.iterrows():
 
   # hypertension and angina
   cv_conditions = []
-  if isinstance(row['CLIN.HYPERT'], (int, float)) and int(row['CLIN.HYPERT']) == 1:
+  if pd.notna(row['CLIN.HYPERT']) and isinstance(row['CLIN.HYPERT'], (int, float)) and int(row['CLIN.HYPERT']) == 1:
     cv_conditions.append("hypertension")
-  if isinstance(row['CLIN.ANGINA'], (int, float)) and int(row['CLIN.ANGINA']) == 1:
+  if pd.notna(row['CLIN.ANGINA']) and isinstance(row['CLIN.ANGINA'], (int, float)) and int(row['CLIN.ANGINA']) == 1:
     cv_conditions.append("angina")
   if cv_conditions:
     if len(cv_conditions) > 1:
@@ -998,9 +1002,9 @@ for idx, row in df.iterrows():
 
   # vitamin b12 deficiency and thyroid disease
   metabolic_conditions = []
-  if isinstance(row['CLIN.VB12DEF'], (int, float)) and int(row['CLIN.VB12DEF']) == 1:
+  if pd.notna(row['CLIN.VB12DEF']) and isinstance(row['CLIN.VB12DEF'], (int, float)) and int(row['CLIN.VB12DEF']) == 1:
     metabolic_conditions.append("a vitamin B12 deficiency")
-  if isinstance(row['CLIN.THYDIS'], (int, float)) and int(row['CLIN.THYDIS']) == 1:
+  if pd.notna(row['CLIN.THYDIS']) and isinstance(row['CLIN.THYDIS'], (int, float)) and int(row['CLIN.THYDIS']) == 1:
     metabolic_conditions.append("a thyroid disease")
   if metabolic_conditions:
     if len(metabolic_conditions) > 1:
@@ -1010,9 +1014,9 @@ for idx, row in df.iterrows():
 
   # arthritis and urinary incontinence
   misc_conditions = []
-  if isinstance(row['CLIN.ARTH'], (int, float)) and int(row['CLIN.ARTH']) == 1:
+  if pd.notna(row['CLIN.ARTH']) and isinstance(row['CLIN.ARTH'], (int, float)) and int(row['CLIN.ARTH']) == 1:
     misc_conditions.append("arthritis")
-  if isinstance(row['CLIN.URINEINC'], (int, float)) and int(row['CLIN.URINEINC']) == 1:
+  if pd.notna(row['CLIN.URINEINC']) and isinstance(row['CLIN.URINEINC'], (int, float)) and int(row['CLIN.URINEINC']) == 1:
     misc_conditions.append("urinary incontinence")
   if misc_conditions:
     if len(misc_conditions) > 1:
